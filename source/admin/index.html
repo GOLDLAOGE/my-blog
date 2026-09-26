@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow"><title>博客管理</title>
+  <link rel="stylesheet" href="/admin/style.css">
+</head>
+<body>
+  <header><a class="brand" href="/admin/">博客管理 <span>个人工作台</span></a><a href="/" target="_blank" rel="noopener">查看博客 ↗</a><button id="logout" hidden>退出登录</button></header>
+  <main>
+    <div id="status" role="status" aria-live="polite">正在检查登录状态…</div>
+    <section id="login" hidden><h1>把想法写成文章。</h1><p>使用 GOLDLAOGE 的 GitHub 账号登录，管理文章、SEO 和主题设置。</p><a class="primary button" href="/api/auth/login">使用 GitHub 登录</a></section>
+    <div id="workspace" hidden>
+      <nav aria-label="后台导航"><button id="posts-tab">文章</button><button id="new-post">新建文章</button><button id="settings-tab">站点与主题</button></nav>
+      <section id="posts-view"><h1>文章</h1><p class="muted">发布后自动提交至 GitHub，由 Cloudflare 构建更新博客。</p><div id="posts-list"></div></section>
+      <section id="editor-view" hidden>
+        <h1 id="editor-heading">新建文章</h1>
+        <form id="post-form">
+          <div class="grid">
+            <label>文章标题<input name="title" required maxlength="300"></label>
+            <label>文章标识（文件名）<input name="slug" required placeholder="my-first-post"><small>文字、数字、横线或下划线；发布后不可更改。</small></label>
+            <label>发布日期<input name="date" type="datetime-local" required></label>
+            <label>SEO 标题<input name="seoTitle" placeholder="留空则使用文章标题"></label>
+            <label>分类<input name="categories" placeholder="生活, 旅行"><small>逗号分隔；多个分类按 Hexo 规则形成层级。</small></label>
+            <label>标签<input name="tags" placeholder="摄影, 记录"></label>
+          </div>
+          <label>SEO 描述<textarea name="description" rows="3" required maxlength="1000" placeholder="简要描述文章内容；建议约 80–150 字"></textarea></label>
+          <label>SEO 关键词<input name="keywords" placeholder="关键词用逗号分隔"></label>
+          <label>文章摘要<textarea name="excerpt" rows="2"></textarea></label>
+          <label>封面图片<input name="cover" placeholder="/media/... 或 https://..."></label>
+          <button type="button" id="upload-cover">上传封面</button>
+          <div class="toolbar"><label>图片说明（alt）<input id="image-alt" placeholder="描述图片内容，有助于无障碍与 SEO"></label><button type="button" id="upload-body">上传并插入图片</button></div>
+          <label>文章正文（Markdown）<textarea name="body" id="body" rows="22" required placeholder="在这里写文章；可使用 Markdown 格式"></textarea></label>
+          <small>JPG/PNG/WebP 会自动缩小至最长边 2560px，以 82% 质量转成 WebP 存入 Cloudflare R2。原图上限 15 MB。</small>
+          <div class="actions"><button class="primary" id="publish" type="submit">发布文章</button><button type="button" id="back-posts">返回文章列表</button></div>
+        </form>
+      </section>
+      <section id="settings-view" hidden><h1>站点与主题设置</h1><p class="muted">只修改常用配置，其余主题配置保持原样。保存后需要等待自动构建。</p><form id="settings-form"><div id="settings-fields"></div><div class="actions"><button class="primary" type="submit">保存设置</button></div></form></section>
+    </div>
+    <input id="image-file" type="file" accept="image/jpeg,image/png,image/webp" hidden>
+  </main>
+  <script type="module" src="/admin/app.js"></script>
+</body>
+</html>

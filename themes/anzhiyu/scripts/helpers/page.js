@@ -12,7 +12,9 @@ const crypto = require("crypto");
 
 hexo.extend.helper.register('page_description', function () {
   const { config, page } = this
-  let description = page.description || page.content || page.title || config.description
+  let description = this.is_home && this.is_home()
+    ? config.description || config.subtitle || config.title
+    : page.description || page.content || page.title || config.description
 
   if (description) {
     description = escapeHTML(stripHTML(description).substring(0, 150)
