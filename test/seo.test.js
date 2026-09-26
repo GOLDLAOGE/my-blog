@@ -26,3 +26,12 @@ it('renders the article SEO title, description and keywords into the real theme 
   expect(html).toContain('name="description" content="搜索描述"');
   expect(html).toContain('name="keywords" content="关键词一,关键词二"');
 });
+it('escapes punctuation in SEO descriptions only once at the HTML boundary', () => {
+  const helpers = {};
+  runInNewContext(readFileSync('themes/anzhiyu/scripts/helpers/page.js', 'utf8'), {
+    require, hexo: { extend: { helper: { register(name, helper) { helpers[name] = helper; } } } },
+  });
+  const description = helpers.page_description.call({ config: {}, page: { description: 'Description "quotes" & ampersand' } });
+  const html = pug.render('meta(name="description" content=description)', { description });
+  expect(html).toContain('content="Description &quot;quotes&quot; &amp; ampersand"');
+});
