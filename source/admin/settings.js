@@ -57,7 +57,7 @@ export function renderSettings(container, payload, upload) {
       if (type === 'boolean') { input.type='checkbox';input.checked=value;label.className='check'; }
       else if (['number','year'].includes(type)) {input.type='number';input.min=rule?.min??0;input.max=rule?.max??(type==='year'?9999:10000);input.value=value;}
       else { input.value = Array.isArray(value) ? value.join('\n') : value === false ? '' : value; }
-      if(type==='color')input.type='color';
+      if(type==='color'){input.type='color';input.value=/^#[0-9a-f]{3}$/i.test(value)?'#'+value.slice(1).split('').map(c=>c+c).join(''):value;}
       if(type==='enum')input.value=String(value);
       const field=document.createElement('div');field.className='setting-field';label.append(input);field.append(label);fields.append(field);controls[scope][key]=input;
       if (['url','image','urls'].includes(type)) { const button=document.createElement('button');button.type='button';button.className='upload-field';button.textContent='上传图片';button.onclick=()=>upload(url=>{input.value=type==='urls' && input.value ? input.value+'\n'+url : url;input.dispatchEvent(new Event('input',{bubbles:true}));});field.append(button); }
@@ -74,6 +74,7 @@ export function renderSettings(container, payload, upload) {
       const row=document.createElement('div');row.className='link-row';
       row.dataset.rowId=data._rowId||'';
       for(const field of key==='social'?['name','url','icon']:['group','name','url','icon']) { const label=document.createElement('label');label.textContent=({group:'分组',name:'名称',url:'链接',icon:key==='navigation'?'图标图片链接':'图标类名'})[field];const input=document.createElement('input');input.dataset.field=field;input.value=data[field]||'';label.append(input);row.append(label); }
+      for(const [action,text] of [['up','上移'],['down','下移']]){const button=document.createElement('button');button.type='button';button.dataset.action=action;button.textContent=text;button.onclick=()=>{const sibling=action==='up'?row.previousElementSibling:row.nextElementSibling;if(sibling)rows.insertBefore(action==='up'?row:sibling,action==='up'?sibling:row);container.dispatchEvent(new Event('input',{bubbles:true}));};row.append(button);}
       const remove=document.createElement('button');remove.type='button';remove.textContent='移除';remove.onclick=()=>{row.remove();container.dispatchEvent(new Event('input',{bubbles:true}));};row.append(remove);rows.append(row);
     };
     (payload.settings[key]||[]).forEach(add);

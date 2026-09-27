@@ -12,7 +12,10 @@ if theme.post_copyright.enable && page.copyright !== false
       a.post-copyright__author_img(href=url_for(copyright_author_link) title='头像')
         img.post-copyright__author_img_back(src=url_for(copyright_author_img_back) title='头像' alt='头像')
         img.post-copyright__author_img_front(src=url_for(copyright_author_img_front) title="头像" alt='头像')
-      .post-copyright__author_name=author
+      if theme.post_copyright.author_href
+        a.post-copyright__author_name(href=url_for(theme.post_copyright.author_href))=author
+      else
+        .post-copyright__author_name=author
       .post-copyright__author_desc=config.subtitle
     .post-copyright__post__info
       if (page.copyright_author && page.copyright_author !== config.author)

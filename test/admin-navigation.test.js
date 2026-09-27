@@ -2,7 +2,28 @@ import { afterEach, expect, it, vi } from 'vitest';
 import { JSDOM } from 'jsdom';
 import { readFileSync } from 'node:fs';
 afterEach(()=>vi.unstubAllGlobals());
+it('locks page editing and navigation while a save request is pending',async()=>{
+  vi.resetModules();const dom=new JSDOM(readFileSync('source/admin/index.html','utf8'),{url:'https://blog.test/admin/'});
+  vi.stubGlobal('document',dom.window.document);vi.stubGlobal('window',dom.window);vi.stubGlobal('Event',dom.window.Event);vi.stubGlobal('confirm',()=>true);
+  let finish;
+  vi.stubGlobal('fetch',async(path,init)=>{
+    if(path==='/api/session')return Response.json({csrf:'fixture'});
+    if(path==='/api/posts')return Response.json({posts:[]});
+    if(path==='/api/pages'&&init.method==='GET')return Response.json({head:'head',pages:[]});
+    if(path==='/api/pages'&&init.method==='POST')return new Promise(resolve=>{finish=()=>resolve(Response.json({sha:'saved'}));});
+    if(path==='/api/pages/about')return Response.json({head:'saved',slug:'about',page:{title:'About',body:'Body',type:''}});
+  });
+  await import('../source/admin/app.js');await document.getElementById('pages-tab').onclick();document.querySelector('[data-create]').click();
+  await vi.waitFor(()=>expect(document.querySelector('#page-fields [name=slug]')).not.toBeNull());
+  document.querySelector('#page-fields [name=slug]').value='about';document.querySelector('#page-fields [name=title]').value='About';
+  const pending=document.getElementById('page-form').onsubmit({preventDefault(){}});
+  expect(document.querySelector('#page-fields [name=body]').disabled).toBe(true);
+  expect(document.getElementById('posts-tab').disabled).toBe(true);
+  await document.getElementById('posts-tab').onclick();expect(document.getElementById('page-editor-view').hidden).toBe(false);
+  finish();await pending;expect(document.getElementById('posts-tab').disabled).toBe(false);
+});
 it('protects dirty page edits when leaving and submits the safe page payload',async()=>{
+  vi.resetModules();
   const dom=new JSDOM(readFileSync('source/admin/index.html','utf8'),{url:'https://blog.test/admin/'});
   vi.stubGlobal('document',dom.window.document);vi.stubGlobal('window',dom.window);vi.stubGlobal('Event',dom.window.Event);vi.stubGlobal('confirm',()=>false);
   const calls=[];

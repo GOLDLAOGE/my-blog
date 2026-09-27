@@ -42,5 +42,7 @@ export function writeFriendLinks(yaml,input) {
     if(!group||typeof group!=='object'||Array.isArray(group)||Object.keys(group).some(k=>!['_rowId','class_name','class_desc','links'].includes(k)))throw new Error('包含未开放的友链字段');
     const {links,...rest}=group;return {...rest,link_list:links};
   });
-  return stringify(writeRows(friendData(yaml),converted,FRIEND_SCHEMA));
+  const saved=writeRows(friendData(yaml),converted,FRIEND_SCHEMA);
+  for(let index=0;index<saved.length;index++)if(converted[index]._rowId===undefined)saved[index].flink_style='anzhiyu';
+  return stringify(saved);
 }

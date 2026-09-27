@@ -12,7 +12,7 @@ export const THEME_FIELDS = {
   subtitle_enable: ['subtitle.enable', 'boolean'], subtitle_effect: ['subtitle.effect', 'boolean'], subtitle_loop: ['subtitle.loop', 'boolean'],
   subtitle_sub: ['subtitle.sub', 'list'], subtitle_type_speed: ['subtitle.typeSpeed', 'number'], subtitle_back_speed: ['subtitle.backSpeed', 'number'],
   footer_owner_enable: ['footer.owner.enable', 'boolean'], footer_since: ['footer.owner.since', 'year'], footer_custom_text: ['footer.custom_text', 'text'],
-  footer_runtime_enable: ['footer.runtime.enable', 'boolean'], footer_launch_time: ['footer.runtime.launch_time', 'text'],
+  footer_runtime_enable: ['footer.runtime.enable', 'boolean'], footer_launch_time: ['footer.runtime.launch_time', 'date'],
   error_404_enable: ['error_404.enable', 'boolean'], error_404_subtitle: ['error_404.subtitle', 'text'], error_404_background: ['error_404.background', 'url'],
   ...SETTINGS_SCHEMA.theme,
 };
@@ -142,8 +142,15 @@ export function writeEditableSettings(rootYaml, themeYaml, input) {
         oldGroup = original[gi]; oldItem = oldGroup?.item?.[ii];
         if (!oldItem) throw new Error('导航行标识无效');
       }
-      if (!groups.has(row.group)) groups.set(row.group, {...oldGroup,title:row.group,item:[]});
-      groups.get(row.group).item.push({ ...oldItem, name: row.name, link: row.url, icon: row.icon });
+      const groupId=row._rowId===undefined?`new:${row.group}`:`old:${row._rowId.split(':')[0]}:${row.group}`;
+      if (!groups.has(groupId)) groups.set(groupId, {...oldGroup,title:row.group,item:[]});
+      groups.get(groupId).item.push({ ...oldItem, name: row.name, link: row.url, icon: row.icon });
+    }
+    // New entries join an unambiguous existing group; duplicate titles stay distinct.
+    for(const [id,group] of [...groups])if(id.startsWith('new:')){
+      const matches=[...groups].filter(([key,value])=>key.startsWith('old:')&&value.title===group.title);
+      if(matches.length>1)throw new Error('导航分组名称重复，请为新增链接使用唯一分组名称');
+      if(matches.length===1){matches[0][1].item.push(...group.item);groups.delete(id);}
     }
     theme.setIn(['nav', 'menu'], [...groups.values()]);
   }

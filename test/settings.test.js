@@ -84,3 +84,13 @@ describe('settings transforms', () => {
     expect(() => writeEditableSettings(root, theme, settings)).toThrow();
   });
 });
+it('preserves duplicate navigation groups and validates footer calendar dates',()=>{
+  const theme='nav:\n  menu:\n    - title: Same\n      hidden: first\n      item:\n        - name: A\n          link: /a/\n          icon: /a.png\n    - title: Same\n      hidden: second\n      item:\n        - name: B\n          link: /b/\n          icon: /b.png\n';
+  const root='title: Test\nurl: https://test.example';const settings=readEditableSettings(root,theme),out=writeEditableSettings(root,theme,settings);
+  expect(out.themeYaml).toContain('hidden: second');
+  expect((out.themeYaml.match(/title: Same/g)||[]).length).toBe(2);
+});
+it('rejects malformed and impossible footer runtime dates',()=>{
+  const root='title: Test\nurl: https://test.example',settings=readEditableSettings(root,'{}');
+  for(const date of ['not-a-date','02/30/2026 00:00:00']){settings.theme.footer_launch_time=date;expect(()=>writeEditableSettings(root,'{}',settings)).toThrow();}
+});
