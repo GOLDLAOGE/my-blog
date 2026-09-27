@@ -1,0 +1,23 @@
+import { afterEach, expect, it, vi } from 'vitest';
+import { JSDOM } from 'jsdom';
+import { renderSettings } from '../source/admin/settings.js';
+import { readEditableSettings, EDITABLE_SCHEMA } from '../functions/_lib/settings.js';
+afterEach(()=>vi.unstubAllGlobals());
+it('collects hidden categories, typed enums and reordered identities without losing edits', () => {
+  const dom = new JSDOM('<div id="fields"></div>');
+  vi.stubGlobal('document',dom.window.document);vi.stubGlobal('Event',dom.window.Event);
+  const container=document.getElementById('fields');
+  const get=renderSettings(container,{schema:EDITABLE_SCHEMA,settings:readEditableSettings('title: Test\nurl: https://test.example','{}')},()=>{});
+  const home=container.querySelector('[data-key="home_top_title"]');
+  expect(home).not.toBeNull();home.value='New home';
+  container.querySelector('[data-category="appearance"]').click();
+  const mode=container.querySelector('[data-key="display_mode"]');
+  expect(mode.tagName).toBe('SELECT');mode.value='dark';
+  const method=container.querySelector('[data-key="index_post_content_method"]');method.value='false';
+  expect(container.querySelector('[data-key="theme_color_main"]').type).toBe('color');
+  container.querySelector('[data-list="home_top_category"] [data-action="down"]').click();
+  const result=get();
+  expect(result.theme.home_top_title).toBe('New home');
+  expect(result.theme.display_mode).toBe('dark');expect(result.theme.index_post_content_method).toBe(false);
+  expect(result.lists.home_top_category.map(r=>r._rowId)).toEqual(['1','0','2']);
+});
