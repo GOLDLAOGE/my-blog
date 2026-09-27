@@ -1,5 +1,13 @@
 ---
 title: Hello World
+date: 2026-09-27T08:45:00.000Z
+categories: []
+tags: []
+excerpt: ""
+cover: /media/posts/2026/09/11935150d5de44219627f2b77901a09c.webp
+seo_title: ""
+description: 测试
+keywords: []
 ---
 Welcome to [Hexo](https://hexo.io/)! This is your very first post. Check [documentation](https://hexo.io/docs/) for more info. If you get any problems when using Hexo, you can find the answer in [troubleshooting](https://hexo.io/docs/troubleshooting.html) or you can ask me on [GitHub](https://github.com/hexojs/hexo/issues).
 
