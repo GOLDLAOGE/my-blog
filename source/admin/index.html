@@ -4,6 +4,7 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex,nofollow"><title>博客管理</title>
   <link rel="stylesheet" href="/admin/style.css">
+  <link rel="stylesheet" href="/admin/vendor/vditor/dist/index.css">
 </head>
 <body>
   <header><a class="brand" href="/admin/">博客管理 <span>个人工作台</span></a><a href="/" target="_blank" rel="noopener">查看博客 ↗</a><button id="logout" hidden>退出登录</button></header>
@@ -23,7 +24,8 @@
           <div class="editor-content"><h2>正文编辑</h2>
           <label>文章标题<input name="title" required maxlength="300"></label>
           <div class="toolbar"><label>图片说明（alt）<input id="image-alt" placeholder="描述即将插入的正文图片"></label><button type="button" id="upload-body">上传并插入图片</button></div>
-          <label>文章正文（Markdown）<textarea name="body" id="body" rows="24" required placeholder="在这里写文章；可使用 Markdown 格式"></textarea></label>
+          <div id="article-editor" aria-label="文章正文编辑器"></div>
+          <textarea name="body" id="body" hidden></textarea>
           <small>支持 JPG/PNG/WebP，原图不超过 15 MB。上传后自动转成 WebP，最长边不超过 2560px。</small>
           </div>
           <aside class="editor-options" aria-label="文章设置">
@@ -51,6 +53,7 @@
     </div>
     <input id="image-file" type="file" accept="image/jpeg,image/png,image/webp" hidden>
   </main>
+  <script src="/admin/vendor/vditor/dist/index.min.js"></script>
   <script type="module" src="/admin/app.js"></script>
 </body>
 </html>

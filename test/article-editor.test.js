@@ -5,10 +5,10 @@ import { createArticleEditor } from '../source/admin/article-editor.js';
 afterEach(()=>vi.unstubAllGlobals());
 // Browser layout/Lute loading are exercised separately in a real browser.
 class Engine {
-  constructor(element, options){this.options=options;this.value='';queueMicrotask(()=>options.after());}
+  constructor(element, options){this.options=options;this.value='';Engine.current=this;queueMicrotask(()=>options.after());}
   setValue(value){this.value=value;this.options.input(value);}
   getValue(){return this.value;}
-  insertValue(value){this.value+=value;this.options.input(this.value);}
+  insertMD(value){this.value+=value;this.options.input(this.value);}
   disabled(){} enable(){} destroy(){}
 }
 async function setup(){const dom=new JSDOM('<div id="editor"></div>');vi.stubGlobal('document',dom.window.document);vi.stubGlobal('Event',dom.window.Event);vi.stubGlobal('Vditor',Engine);const changes=[];const editor=await createArticleEditor({element:document.querySelector('#editor'),onChange:md=>changes.push(md)});return {editor,changes};}
@@ -23,3 +23,6 @@ it('uses source selection and preserves input while composing',async()=>{
   const {editor}=await setup();editor.load('前面 后面');editor.setMode('source');const source=document.querySelector('textarea');source.setSelectionRange(3,5);editor.insertMarkdown('替换');expect(editor.getMarkdown()).toBe('前面 替换');source.dispatchEvent(new document.defaultView.CompositionEvent('compositionstart',{bubbles:true}));expect(()=>editor.setMode('visual')).toThrow(/输入/);source.dispatchEvent(new document.defaultView.CompositionEvent('compositionend',{bubbles:true}));expect(()=>editor.setMode('visual')).not.toThrow();
 });
 it('retains theme components while visual text is edited and emits real tag syntax',async()=>{const {editor}=await setup();editor.load('前文\n\n{% note info %}\n重要\n{% endnote %}\n\n<div>原文</div>');editor.insertMarkdown('\n\n新增');expect(editor.getMarkdown()).toContain('{% note info %}\n重要\n{% endnote %}');expect(editor.getMarkdown()).toContain('<div>原文</div>');expect(editor.getMarkdown()).not.toContain('cms-block');});
+it('reads the last native keystroke before the engine debounce callback fires',async()=>{const {editor}=await setup();editor.load('旧内容');Engine.current.value='即时输入';document.querySelector('#editor>div').dispatchEvent(new Event('input',{bubbles:true}));expect(editor.getMarkdown()).toBe('即时输入');});
+it('does not insert UI nodes into the document that the engine serializes',async()=>{const {editor}=await setup();editor.load('{% note info %}\n重要\n{% endnote %}');const visual=document.querySelector('#editor>div'),token=Engine.current.value.match(/^cms-(?!block)[^\n]+/m)[0];visual.innerHTML='<div data-type="code-block"><pre><code>'+token+'</code></pre></div>';await Promise.resolve();expect(visual.querySelector('button')===null).toBe(true);});
+it('undoes and redoes component edits without losing protected originals',async()=>{const {editor}=await setup();editor.load('原文');editor.insertMarkdown('\n\n{% note info %}\n新增\n{% endnote %}');editor.undo();expect(editor.getMarkdown()).toBe('原文');editor.redo();expect(editor.getMarkdown()).toContain('{% note info %}');editor.replaceBlock(editor.getBlocks()[0],'{% note warning %}\n修改\n{% endnote %}');editor.undo();expect(editor.getMarkdown()).toContain('新增');});
