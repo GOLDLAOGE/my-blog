@@ -1,4 +1,5 @@
 import { createArticleEditor } from './article-editor.js';
+import { renderArticlePreview } from './article-preview.js';
 import { serializeThemeBlock, safeEditorUrl } from './theme-blocks.js';
 
 const titles={link:'链接卡片',note:'提示块',folding:'折叠内容',tabs:'标签页',mermaid:'流程图',code:'代码块',image:'图片与说明'};
@@ -19,7 +20,8 @@ export async function mountArticleEditor({element,sourceInput,onChange=()=>{},on
   function refreshBlocks(){blockList.replaceChildren();try{const blocks=editor.getBlocks();if(!blocks.length)return;const heading=document.createElement('h3');heading.textContent='正文中的主题组件';blockList.append(heading);for(const block of blocks){const row=document.createElement('div');row.className='editor-block-row';const name=document.createElement('span');name.textContent=block.type==='opaque'?'自定义内容（原样保留）':titles[block.type];row.append(name,button(block.type==='opaque'?'查看源码':'编辑',()=>openDialog(block.type,block)),button('移除',()=>{if(!disabled&&confirm('移除此正文组件？')){editor.replaceBlock(block,'');}}));blockList.append(row);}}catch(error){report(error);}}
   function setMode(mode){try{if(disabled)return;editor.setMode(mode);active=mode;host.hidden=false;preview.hidden=true;for(const item of modes.querySelectorAll('button'))item.setAttribute('aria-pressed',String(item.dataset.editorMode===mode));sourceInput.value=editor.getMarkdown();}catch(error){report(error);}}
   for(const [mode,title]of [['visual','可视化编辑'],['source','Markdown 源码']]){const el=button(title,()=>setMode(mode));el.dataset.editorMode=mode;el.setAttribute('aria-pressed',String(mode==='visual'));modes.append(el);}
-  const previewButton=button('正文预览',()=>{report(new Error('正文预览正在接入'));});previewButton.dataset.editorMode='preview';modes.append(previewButton);
+  let previewController;
+  const previewButton=button('正文预览',async()=>{try{if(disabled)return;const markdown=editor.getMarkdown();previewController?.abort();previewController=new AbortController();host.hidden=true;preview.hidden=false;preview.replaceChildren();const hint=document.createElement('p');hint.textContent='正文近似预览；实际效果以构建后的文章为准。';const body=document.createElement('div');preview.append(hint,body);for(const item of modes.querySelectorAll('button'))item.setAttribute('aria-pressed',String(item===previewButton));await renderArticlePreview({element:body,markdown,signal:previewController.signal});}catch(error){report(error);}});previewButton.dataset.editorMode='preview';modes.append(previewButton);
   for(const [label,types]of [['内容插入',['image','code']],['主题组件',['link','note','folding','tabs','mermaid']]]){const group=document.createElement('div');group.className='editor-tool-group';const name=document.createElement('span');name.textContent=label;group.append(name);for(const type of types){const el=button(titles[type],()=>openDialog(type));el.dataset.insert=type;group.append(el);}extras.append(group);}
   editor=await createArticleEditor({element:host,onChange:sync,onError:report,onEditBlock:block=>{const current=editor.getBlocks().find(b=>b.raw===block.raw);if(current)openDialog(current.type,current);}});
   function openDialog(type,block){
