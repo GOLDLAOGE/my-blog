@@ -1,7 +1,7 @@
 import { json } from '../_lib/http.js';
 import { contentRoute, readJson, validation } from '../_lib/content-api.js';
 import { conflict, repositoryHead, readRepositoryFile, writeRepositoryFiles } from '../_lib/github-repo.js';
-import { readEditableSettings, writeEditableSettings, SITE_FIELDS, THEME_FIELDS } from '../_lib/settings.js';
+import { readEditableSettings, writeEditableSettings, EDITABLE_SCHEMA } from '../_lib/settings.js';
 
 async function snapshot(env) {
   const head = await repositoryHead(env);
@@ -11,7 +11,7 @@ async function snapshot(env) {
 export async function onRequestGet(context) {
   return contentRoute(context, false, async () => {
     const { head, root, theme } = await snapshot(context.env);
-    return json({ head, settings: readEditableSettings(root.content, theme.content), schema: { site: SITE_FIELDS, theme: THEME_FIELDS } });
+    return json({ head, settings: readEditableSettings(root.content, theme.content), schema: EDITABLE_SCHEMA });
   });
 }
 export async function onRequestPut(context) {

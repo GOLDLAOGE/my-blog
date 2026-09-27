@@ -1,11 +1,63 @@
 import { describe, it, expect } from 'vitest';
 import { parse } from 'yaml';
+import { readFileSync } from 'node:fs';
+import { THEME_FIELDS } from '../functions/_lib/settings.js';
 import { readEditableSettings, writeEditableSettings } from '../functions/_lib/settings.js';
 
 const root = '# keep comment\ntitle: Old\nurl: https://blog.test\npermalink: :year/:title/\n';
 const theme = 'avatar:\n  img: /old.webp\n  effect: true\nunknown:\n  value: preserve\nmenu:\n  博客:\n    首页: / || anzhiyu-icon-house\n';
 
 describe('settings transforms', () => {
+  it('matches all non-null scalar defaults from the installed theme', () => {
+    const installed = parse(readFileSync(new URL('../themes/anzhiyu/_config.yml',import.meta.url),'utf8'));
+    const fallback = readEditableSettings(root, '{}').theme;
+    for (const [key,[path]] of Object.entries(THEME_FIELDS)) {
+      const expected = path.split('.').reduce((node,part)=>node?.[part],installed);
+      if (expected != null) expect(fallback[key],path).toEqual(expected);
+    }
+  });
+  it('preserves navigation group and item attributes on rename and reorder', () => {
+    const source = 'nav:\n  menu:\n    - title: Group\n      custom: keep-group\n      item:\n        - name: One\n          link: /one/\n          icon: /one.png\n          custom: keep-item\n';
+    const settings = readEditableSettings(root, source);
+    settings.navigation[0].name = 'Changed';
+    const saved = parse(writeEditableSettings(root, source, settings).themeYaml).nav.menu[0];
+    expect(saved.custom).toBe('keep-group');
+    expect(saved.item[0].custom).toBe('keep-item');
+  });
+  it('rejects duplicate and unknown list identities', () => {
+    const settings = readEditableSettings(root,theme);
+    const first = settings.lists.home_top_category[0];
+    settings.lists.home_top_category = [first,first];
+    expect(()=>writeEditableSettings(root,theme,settings)).toThrow();
+    settings.lists.home_top_category = [{...first,_rowId:'999'}];
+    expect(()=>writeEditableSettings(root,theme,settings)).toThrow();
+  });
+  it('uses actual theme defaults for missing frontend fields', () => {
+    const settings = readEditableSettings(root, theme);
+    expect(settings.theme.aside_enable).toBe(true);
+    expect(settings.theme.display_mode).toBe('light');
+    expect(settings.theme.home_top_title).toBe('生活明朗');
+    expect(settings.theme.index_post_content_method).toBe(3);
+  });
+  it('preserves hidden list attributes when duplicate names are reordered and renamed', () => {
+    const source = 'home_top:\n  category:\n    - name: Same\n      path: /one/\n      icon: icon-one\n      class: blue\n      custom: first\n    - name: Same\n      path: /two/\n      icon: icon-two\n      class: red\n      custom: second\n';
+    const settings = readEditableSettings(root, source);
+    expect(settings.lists?.home_top_category).toHaveLength(2);
+    settings.lists.home_top_category.reverse();
+    settings.lists.home_top_category[0].name = 'Renamed';
+    const saved = parse(writeEditableSettings(root, source, settings).themeYaml).home_top.category;
+    expect(saved[0]).toMatchObject({ name: 'Renamed', custom: 'second', shadow: 'var(--anzhiyu-shadow-red)' });
+    expect(saved[1].custom).toBe('first');
+    expect(saved[0]._rowId).toBeUndefined();
+  });
+  it.each([
+    ['theme_color_main', 'red'], ['display_mode', 'system'],
+    ['runtimeshow_publish_date', '02/30/2026 00:00:00'], ['aside_card_tags_limit', 1001],
+  ])('rejects invalid frontend field %s', (key, value) => {
+    const settings = readEditableSettings(root, theme);
+    settings.theme[key] = value;
+    expect(() => writeEditableSettings(root, theme, settings)).toThrow();
+  });
   it('updates selected fields while preserving comments and unrelated keys', () => {
     const settings = readEditableSettings(root, theme);
     settings.site.title = '新站点';
