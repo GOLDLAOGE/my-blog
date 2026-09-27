@@ -1,4 +1,5 @@
 import { requireEnv } from './env.js';
+import { pagePath } from './pages.js';
 
 const BASE = 'https://api.github.com/repos/GOLDLAOGE/my-blog';
 export const contentBranch = env => env.CMS_CONTENT_BRANCH || 'main';
@@ -31,6 +32,23 @@ export async function readRepositoryFile(env, path, ref = contentBranch(env)) {
 export async function listRepositoryPosts(env) {
   const files = await githubRequest(env, `/contents/source/_posts?ref=${encodeURIComponent(contentBranch(env))}`);
   return files.filter(file => file.type === 'file' && file.name.endsWith('.md')).map(file => ({ slug: file.name.slice(0, -3), sha: file.sha }));
+}
+async function pageTree(env, head) {
+  const result=await githubRequest(env,`/git/trees/${encodeURIComponent(head)}?recursive=1`);
+  if(result.truncated||!Array.isArray(result.tree))throw Object.assign(new Error('页面目录不完整，请稍后重试'),{status:502});
+  return result.tree;
+}
+export async function listRepositoryPages(env, head) {
+  const tree=await pageTree(env,head);
+  return tree.filter(file=>file.type==='blob').flatMap(file=>{
+    const match=file.path.match(/^source\/([^/]+)\/index\.md$/);if(!match)return [];
+    try{if(pagePath(match[1])!==file.path)return [];}catch{return [];}
+    return [{slug:match[1],path:file.path}];
+  }).sort((a,b)=>a.slug.localeCompare(b.slug));
+}
+export async function assertPageAvailable(env, slug, head) {
+  const prefix=`source/${slug.toLowerCase()}`;
+  if((await pageTree(env,head)).some(file=>{const path=file.path.toLowerCase();return path===`${prefix}.md`||path===`${prefix}.html`||path===prefix||path.startsWith(prefix+'/');}))throw conflict();
 }
 export async function repositoryHead(env) {
   const ref = await githubRequest(env, `/git/ref/heads/${pathUrl(contentBranch(env))}`);
