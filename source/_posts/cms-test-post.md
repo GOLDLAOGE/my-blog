@@ -6,7 +6,7 @@ categories:
 tags:
   - 测试
 excerpt: 测试
-cover: ""
+cover: /media/posts/2026/09/354f270c0614461a8b66cf5a3477aa51.webp
 seo_title: 第一篇博客
 description: 测试
 keywords:
