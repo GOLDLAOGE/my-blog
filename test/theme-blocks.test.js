@@ -1,5 +1,7 @@
 import { expect, it } from 'vitest';
 import { parseThemeBlocks, serializeThemeBlock, protectThemeBlocks, restoreThemeBlocks } from '../source/admin/theme-blocks.js';
+it('keeps inline HTML in its sentence while restoring opaque content',()=>{const raw='这是<em>重要</em>说明。',protectedValue=protectThemeBlocks(raw);expect(restoreThemeBlocks(protectedValue.markdown,protectedValue.blocks)).toBe(raw);});
+it.each(['    <div>literal</div>','> ```html\n> <div>literal</div>\n> ```','- ```html\n  <div>literal</div>\n  ```'])('does not extract HTML or tags inside nested literal code: %s',raw=>{expect(parseThemeBlocks(raw)).toEqual([]);expect(protectThemeBlocks(raw).markdown).toBe(raw);});
 it.each([
  ['link',{title:'文档',site:'站点',url:'https://example.com',image:'/icon.webp'},'{% link 文档, 站点, https://example.com, /icon.webp %}'],
  ['note',{style:'info',body:'**提示**'},'{% note info %}\n**提示**\n{% endnote %}'],

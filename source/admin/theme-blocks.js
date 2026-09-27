@@ -1,8 +1,13 @@
 const paired=new Set(['note','subnote','folding','tabs','subtabs','subsubtabs','mermaid','hide','gallery','timeline']);
 const names=new Set(['link','note','folding','tabs','mermaid']);
 function excludedRanges(markdown){
-  const ranges=[];const expression=/^( {0,3})(`{3,}|~{3,})[^\n]*\n[\s\S]*?^\1\2[^\n]*(?:\n|$)|(`+)[^`\n]*?\3/gm;
-  for(const match of markdown.matchAll(expression))ranges.push([match.index,match.index+match[0].length]);
+  const ranges=[];let offset=0,fence;
+  for(const line of markdown.split(/(?<=\n)/)){const normalized=line.replace(/^(?: {0,3}>[ \t]?)+/,'').replace(/^ {0,3}(?:[-+*]|\d+[.)])[ \t]+/,'');const marker=normalized.match(/^\s*(`{3,}|~{3,})/);
+    if(fence){if(marker&&marker[1][0]===fence.char&&marker[1].length>=fence.length){ranges.push([fence.start,offset+line.length]);fence=null;}}
+    else if(marker)fence={char:marker[1][0],length:marker[1].length,start:offset};
+    else if(/^(?: {4}|\t)/.test(normalized))ranges.push([offset,offset+line.length]);offset+=line.length;}
+  if(fence)ranges.push([fence.start,markdown.length]);
+  for(const match of markdown.matchAll(/(`+)[^`\n]*?\1/g))ranges.push([match.index,match.index+match[0].length]);
   return ranges;
 }
 function fieldsFor(type,args,body){
@@ -29,7 +34,7 @@ export function parseThemeBlocks(markdown){
     const raw=markdown.slice(match.index,end);blocks.push({start:match.index,end,type,fields:fieldsFor(type,args,body),raw});covered=end;
   }
   const html=/<([a-zA-Z][\w:-]*)\b[^>]*>[\s\S]*?<\/\1\s*>|<!--[\s\S]*?-->|<\/?[a-zA-Z][^>]*>/g;
-  for(const match of markdown.matchAll(html)){const start=match.index,end=start+match[0].length;if(isExcluded(start)||blocks.some(b=>start<b.end&&end>b.start))continue;blocks.push({start,end,type:'opaque',fields:{},raw:match[0]});}
+  for(const match of markdown.matchAll(html)){const start=match.index,end=start+match[0].length;if(isExcluded(start)||blocks.some(b=>start<b.end&&end>b.start))continue;const inline=!/^<(?:div|p|section|article|figure|table|details|script|style|pre|ul|ol|blockquote)\b/i.test(match[0]);blocks.push({start,end,type:'opaque',inline,fields:{},raw:match[0]});}
   return blocks.sort((a,b)=>a.start-b.start);
 }
 function parameter(value,label,required=false){const text=String(value||'').trim();if((required&&!text)||/[,\r\n<>"'{}%@]/.test(text))throw new Error(`${label}不能为空或包含逗号、换行、标签字符`);return text;}
@@ -46,11 +51,12 @@ export function serializeThemeBlock({type,fields:f}){
 export function protectThemeBlocks(markdown){
   const prefix='cms-'+(globalThis.crypto?.randomUUID?.()||Math.random().toString(36).slice(2));
   const blocks=parseThemeBlocks(markdown).map((block,index)=>({...block,id:prefix+'-'+index}));
-  let output=markdown;for(const block of [...blocks].reverse())output=output.slice(0,block.start)+`\n\n\`\`\`cms-block\n${block.id}\n\`\`\`\n\n`+output.slice(block.end);
+  let output=markdown;for(const block of [...blocks].reverse())output=output.slice(0,block.start)+(block.inline?'`'+block.id+'`':`\n\n\`\`\`cms-block\n${block.id}\n\`\`\`\n\n`)+output.slice(block.end);
   return {markdown:output,blocks};
 }
 export function restoreThemeBlocks(markdown,blocks){
   let output=markdown;
-  for(const block of blocks){const id=block.id.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');const pattern=new RegExp('(?:\\n\\n)?```cms-block\\s*\\n'+id+'\\s*\\n```(?:\\n\\n)?','g');const matches=[...output.matchAll(pattern)];if(matches.length!==1)throw new Error('主题组件被删除或损坏，请撤销操作或恢复源码后再提交');output=output.replace(pattern,(match,offset)=>{const before=output.slice(0,offset),after=output.slice(offset+match.length);return (before&&!before.endsWith('\n')?'\n\n':'')+block.raw+(after&&!after.startsWith('\n')?'\n\n':'');});}
+  for(const block of blocks.filter(b=>b.inline)){const token='`'+block.id+'`';if(output.split(token).length!==2)throw new Error('内联内容被删除或损坏，请撤销操作');output=output.replace(token,block.raw);}
+  for(const block of blocks.filter(b=>!b.inline)){const id=block.id.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');const pattern=new RegExp('(?:\\n\\n)?```cms-block\\s*\\n'+id+'\\s*\\n```(?:\\n\\n)?','g');const matches=[...output.matchAll(pattern)];if(matches.length!==1)throw new Error('主题组件被删除或损坏，请撤销操作或恢复源码后再提交');output=output.replace(pattern,(match,offset)=>{const before=output.slice(0,offset),after=output.slice(offset+match.length);return (before&&!before.endsWith('\n')?'\n\n':'')+block.raw+(after&&!after.startsWith('\n')?'\n\n':'');});}
   if(/```cms-block\b/.test(output))throw new Error('发现未识别的内部组件，不能提交');return output;
 }
