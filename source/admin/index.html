@@ -45,7 +45,7 @@
           <label>SEO 描述<textarea name="description" rows="3" required maxlength="1000" placeholder="简要描述文章内容；建议约 80–150 字"></textarea></label>
           <label>SEO 关键词<input name="keywords" placeholder="关键词用逗号分隔"></label>
           </fieldset></aside></div>
-          <div class="actions"><button class="primary" id="publish" type="submit">发布文章</button><button type="button" id="back-posts">返回文章列表</button></div>
+          <div class="actions"><button class="primary" id="publish" type="submit">发布文章</button><button id="retry-post-read" type="button" hidden>重新读取已提交文章</button><button type="button" id="back-posts">返回文章列表</button></div>
         </form>
       </section>
       <section id="settings-view" hidden><h1>系统设置</h1><p class="muted">按分类调整基础信息与前台外观，其余主题配置保持原样。</p><form id="settings-form"><div id="settings-fields"></div><div class="actions"><button class="primary" type="submit">保存全部设置</button><small>包含所有分类中的修改；提交后需等待 Cloudflare 构建。</small></div></form></section>

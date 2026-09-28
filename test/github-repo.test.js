@@ -3,7 +3,7 @@ import { readRepositoryFile, writeRepositoryFile, writeRepositoryFiles } from '.
 afterEach(() => vi.unstubAllGlobals());
 const env = { GITHUB_REPO_TOKEN: 'test-only-token' };
 it('decodes Chinese repository contents and sends the expected revision on update', async () => {
-  const responses = [Response.json({ content: Buffer.from('中文正文').toString('base64'), sha: 'old' }), Response.json({ commit: { sha: 'new' } })];
+  const responses = [Response.json({ content: Buffer.from('中文正文').toString('base64'), sha: 'old' }), Response.json({ commit: { sha: 'new' }, content: { sha: 'new-file' } })];
   let payload;
   vi.stubGlobal('fetch', async (url, init) => {
     expect(url).toContain('/repos/GOLDLAOGE/my-blog/contents/source/_posts/test.md');
@@ -11,7 +11,7 @@ it('decodes Chinese repository contents and sends the expected revision on updat
     return responses.shift();
   });
   expect(await readRepositoryFile(env, 'source/_posts/test.md')).toMatchObject({ content: '中文正文', sha: 'old' });
-  expect(await writeRepositoryFile(env, { path: 'source/_posts/test.md', content: '新内容', sha: 'old', message: 'update' })).toEqual({ sha: 'new' });
+  expect(await writeRepositoryFile(env, { path: 'source/_posts/test.md', content: '新内容', sha: 'old', message: 'update' })).toEqual({ sha: 'new', fileSha: 'new-file' });
   expect(payload).toMatchObject({ branch: 'main', sha: 'old' });
   expect(Buffer.from(payload.content, 'base64').toString()).toBe('新内容');
 });

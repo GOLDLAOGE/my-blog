@@ -56,7 +56,7 @@ export async function repositoryHead(env) {
 }
 export async function writeRepositoryFile(env, { path, content, sha, message }) {
   const result = await githubRequest(env, `/contents/${pathUrl(path)}`, { method: 'PUT', body: JSON.stringify({ branch: contentBranch(env), content: encode(content), ...(sha ? { sha } : {}), message }) });
-  return { sha: result.commit.sha };
+  return { sha: result.commit.sha, fileSha: result.content?.sha };
 }
 export async function writeRepositoryFiles(env, { head, files, message }) {
   if (await repositoryHead(env) !== head) throw conflict();
