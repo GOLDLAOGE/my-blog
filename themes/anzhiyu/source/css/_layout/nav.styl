@@ -33,12 +33,17 @@
   align-items: center;
 
 #page-header.nav-fixed #center-console
-  & + label i
+  i
     background: var(--font-color);
 #center-console
-  display: none
-  & + label
+  &.widget
     --icon-size: 1.375rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 0;
+    padding: 0;
     position: relative;
     right: 0;
     top: 0;
@@ -77,7 +82,7 @@
         left: auto;
         right: 0;
         width: calc(var(--icon-size)/2);
-  &:checked + label
+  &[aria-expanded="true"]
     right: 0
     top: 0.5rem;
     z-index: 31;
@@ -106,7 +111,7 @@
     i.right
       width: 100% !important;
       transform: rotate(45deg) !important;
-[data-theme="dark"] #center-console:checked + label:is(.widget, #center-console:checked + label .widget:hover) i
+[data-theme="dark"] #center-console[aria-expanded="true"] i
   background: var(--anzhiyu-black) !important;
 #body-wrap
   .nav-fixed #travellings_button
@@ -392,7 +397,22 @@
   transition: color 0s !important
 
 #nav div#toggle-menu
-  padding 2px 0 4px 6px
+  padding 0
+  button.site-page
+    display flex
+    align-items center
+    justify-content center
+    width 44px
+    height 44px
+    padding 0
+    border 0
+    background transparent
+    color inherit
+    cursor pointer
+
+#nav.hide-menu #toggle-menu button.site-page
+  width 44px
+  height 44px
 
 #page-name:hover:before
   opacity 1
@@ -553,6 +573,12 @@
 
 #nav .nav-button a:hover
   color var(--anzhiyu-white) !important
+
+#nav button:focus-visible,
+#console button:focus-visible,
+#sidebar button:focus-visible
+  outline 2px solid var(--anzhiyu-theme)
+  outline-offset 3px
 
 #menus > div.menus_items a
   font-weight bold
@@ -734,6 +760,16 @@
     background var(--anzhiyu-background)
   #page-header #nav #nav-right div
     margin-left .5rem
+  #nav #randomPost_button a.site-page
+    width 44px
+    height 44px
+
+@media (prefers-reduced-motion: reduce)
+  #center-console.widget,
+  #center-console.widget i,
+  #nav #randomPost_button a.site-page,
+  #nav div#toggle-menu button.site-page
+    transition none
 
 @media screen and (min-width: 768px)
   .menus_item:hover > a.site-page

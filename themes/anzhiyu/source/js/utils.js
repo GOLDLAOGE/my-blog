@@ -92,6 +92,10 @@ const anzhiyu = {
 
   scrollToDest: (pos, time = 500) => {
     const currentPos = window.pageYOffset;
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+      window.scrollTo(0, pos);
+      return;
+    }
     if ("scrollBehavior" in document.documentElement.style) {
       window.scrollTo({
         top: pos,
@@ -140,17 +144,140 @@ const anzhiyu = {
   },
 
   animateIn: (ele, text) => {
+    if (ele._hideAnimationEnd) {
+      ele.removeEventListener("animationend", ele._hideAnimationEnd);
+      ele._hideAnimationEnd = null;
+    }
     ele.style.display = "block";
-    ele.style.animation = text;
+    ele.style.animation = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? "none" : text;
   },
 
   animateOut: (ele, text) => {
-    ele.addEventListener("animationend", function f() {
+    if (ele._hideAnimationEnd) ele.removeEventListener("animationend", ele._hideAnimationEnd);
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
       ele.style.display = "";
       ele.style.animation = "";
-      ele.removeEventListener("animationend", f);
-    });
+      ele._hideAnimationEnd = null;
+      return;
+    }
+    ele._hideAnimationEnd = function () {
+      ele.style.display = "";
+      ele.style.animation = "";
+      ele.removeEventListener("animationend", ele._hideAnimationEnd);
+      ele._hideAnimationEnd = null;
+    };
+    ele.addEventListener("animationend", ele._hideAnimationEnd);
     ele.style.animation = text;
+  },
+
+  initMobileSidebar: function () {
+    if (this._mobileSidebarCleanup) this._mobileSidebarCleanup();
+    const toggle = document.querySelector("#toggle-menu button");
+    const menu = document.getElementById("sidebar-menus");
+    const mask = document.getElementById("menu-mask");
+    if (!toggle || !menu || !mask) return;
+    let pendingFocusTimer;
+
+    const setOpen = (open, returnFocus = true) => {
+      if (menu.classList.contains("open") === open) return;
+      window.clearTimeout(pendingFocusTimer);
+      pendingFocusTimer = null;
+      if (open) {
+        anzhiyu.sidebarPaddingR();
+        anzhiyu.animateIn(mask, "to_show 0.5s");
+      } else {
+        document.body.style.paddingRight = "";
+        anzhiyu.animateOut(mask, "to_hide 0.5s");
+      }
+      menu.classList.toggle("open", open);
+      menu.toggleAttribute("inert", !open);
+      menu.setAttribute("aria-hidden", String(!open));
+      toggle.setAttribute("aria-expanded", String(open));
+      if (open) {
+        pendingFocusTimer = window.setTimeout(() => {
+          pendingFocusTimer = null;
+          if (menu.classList.contains("open") && menu.isConnected) {
+            menu.querySelector('a[href], button:not([disabled]), [tabindex="0"]')?.focus();
+          }
+        }, 0);
+      } else if (returnFocus && toggle.isConnected) {
+        toggle.focus();
+      }
+    };
+    menu.toggleAttribute("inert", !menu.classList.contains("open"));
+    menu.setAttribute("aria-hidden", String(!menu.classList.contains("open")));
+    toggle.setAttribute("aria-expanded", String(menu.classList.contains("open")));
+
+    const onToggle = () => setOpen(!menu.classList.contains("open"));
+    const onMask = () => {
+      if (menu.classList.contains("open")) setOpen(false);
+      else anzhiyu.animateOut(mask, "to_hide 0.5s");
+    };
+    const onKey = event => {
+      if (event.key === "Escape" && menu.classList.contains("open")) setOpen(false);
+    };
+    const onResize = () => {
+      if (menu.classList.contains("open") && window.innerWidth > 768) {
+        const focusWasInside = menu.contains(document.activeElement) || document.activeElement === toggle || document.activeElement === document.body;
+        setOpen(false, false);
+        if (focusWasInside) document.getElementById("site-name")?.focus();
+      }
+    };
+    toggle.addEventListener("click", onToggle);
+    mask.addEventListener("click", onMask);
+    window.addEventListener("keydown", onKey);
+    window.addEventListener("resize", onResize);
+    this._mobileSidebarCleanup = () => {
+      window.clearTimeout(pendingFocusTimer);
+      toggle.removeEventListener("click", onToggle);
+      mask.removeEventListener("click", onMask);
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("resize", onResize);
+    };
+  },
+
+  syncConsoleAccessibility: function () {
+    const panel = document.getElementById("console");
+    const toggle = document.getElementById("center-console");
+    if (!panel) return;
+    const open = panel.classList.contains("show") || panel.classList.contains("reward-show");
+    toggle?.setAttribute("aria-expanded", String(open));
+    panel.setAttribute("aria-hidden", String(!open));
+    panel.toggleAttribute("inert", !open);
+  },
+
+  isVisibleConsoleControl: function (control) {
+    for (let element = control; element && element !== document.body; element = element.parentElement) {
+      if (element.hidden || element.hasAttribute("inert") || element.getAttribute("aria-hidden") === "true") return false;
+      const style = window.getComputedStyle(element);
+      if (style.display === "none" || style.visibility === "hidden" || style.visibility === "collapse") return false;
+    }
+    return true;
+  },
+
+  initConsoleAccessibility: function () {
+    if (this._consoleAccessibilityCleanup) this._consoleAccessibilityCleanup();
+    const toggle = document.getElementById("center-console");
+    const panel = document.getElementById("console");
+    if (!toggle || !panel) return;
+    const onToggle = () => {
+      anzhiyu.switchConsole();
+    };
+    const onMask = () => anzhiyu.hideConsole();
+    const onKey = event => {
+      if (event.key === "Escape" && (panel.classList.contains("show") || panel.classList.contains("reward-show"))) {
+        anzhiyu.hideConsole();
+      }
+    };
+    toggle.addEventListener("click", onToggle);
+    panel.querySelector(".console-mask")?.addEventListener("click", onMask);
+    window.addEventListener("keydown", onKey);
+    this._consoleAccessibilityCleanup = () => {
+      toggle.removeEventListener("click", onToggle);
+      panel.querySelector(".console-mask")?.removeEventListener("click", onMask);
+      window.removeEventListener("keydown", onKey);
+    };
+    this.syncConsoleAccessibility();
   },
 
   /**
@@ -644,7 +771,12 @@ const anzhiyu = {
     return config[configKey];
   },
   //切换音乐播放状态
-  musicToggle: function (changePaly = true) {
+  musicToggle: async function (changePaly = true) {
+    const player = changePaly
+      ? await anzhiyu.getNavMusicPlayer()
+      : document.querySelector("#nav-music meting-js")?.aplayer;
+    navMusicEl = document.getElementById("nav-music");
+    if (!player || !navMusicEl) return false;
     if (!anzhiyu_musicFirst) {
       anzhiyu.musicBindEvent();
       anzhiyu_musicFirst = true;
@@ -653,20 +785,82 @@ const anzhiyu = {
     let msgPause = '<i class="anzhiyufont anzhiyu-icon-pause"></i><span>暂停音乐</span>';
     if (anzhiyu_musicPlaying) {
       navMusicEl.classList.remove("playing");
-      document.getElementById("menu-music-toggle").innerHTML = msgPlay;
-      document.getElementById("nav-music-hoverTips").innerHTML = "音乐已暂停";
-      document.querySelector("#consoleMusic").classList.remove("on");
+      const menu = document.getElementById("menu-music-toggle");
+      if (menu) menu.innerHTML = msgPlay;
+      const tips = document.getElementById("nav-music-hoverTips");
+      if (tips) tips.innerHTML = "音乐已暂停";
+      document.querySelector("#consoleMusic")?.classList.remove("on");
       anzhiyu_musicPlaying = false;
       navMusicEl.classList.remove("stretch");
     } else {
       navMusicEl.classList.add("playing");
-      document.getElementById("menu-music-toggle").innerHTML = msgPause;
-      document.querySelector("#consoleMusic").classList.add("on");
+      const menu = document.getElementById("menu-music-toggle");
+      if (menu) menu.innerHTML = msgPause;
+      document.querySelector("#consoleMusic")?.classList.add("on");
       anzhiyu_musicPlaying = true;
       navMusicEl.classList.add("stretch");
     }
-    if (changePaly) document.querySelector("#nav-music meting-js").aplayer.toggle();
+    if (changePaly) player.toggle();
     rm && rm.hideRightMenu();
+    return true;
+  },
+  getNavMusicPlayer: async function () {
+    if (typeof window.ensureOptionalAudio === "function" && !(await window.ensureOptionalAudio())) return null;
+    let player = document.querySelector("#nav-music meting-js")?.aplayer;
+    if (player || !document.querySelector("#nav-music meting-js")) return player || null;
+    return new Promise(resolve => {
+      let attempts = 0;
+      const check = () => {
+        player = document.querySelector("#nav-music meting-js")?.aplayer;
+        if (player || ++attempts >= 50) resolve(player || null);
+        else setTimeout(check, 100);
+      };
+      check();
+    });
+  },
+  initNavMusicPauseListener: function () {
+    if (this._navMusicListenerCleanup) this._navMusicListenerCleanup();
+    let timer;
+    const bind = () => {
+      clearTimeout(timer);
+      const nav = document.getElementById("nav-music");
+      const meting = nav?.querySelector("meting-js");
+      if (!meting) return;
+      const player = meting.aplayer;
+      if (!player) {
+        let attempts = 0;
+        const retry = () => {
+          if (meting.aplayer) bind();
+          else if (++attempts < 50) timer = setTimeout(retry, 100);
+        };
+        timer = setTimeout(retry, 100);
+        return;
+      }
+      if (player._anzhiyuNavBound) return;
+      player._anzhiyuNavBound = true;
+      const setPlaying = playing => {
+        nav.classList.toggle("playing", playing);
+        const menu = document.getElementById("menu-music-toggle");
+        if (menu) menu.innerHTML = playing
+          ? '<i class="anzhiyufont anzhiyu-icon-pause"></i><span>暂停音乐</span>'
+          : '<i class="anzhiyufont anzhiyu-icon-play"></i><span>播放音乐</span>';
+        document.getElementById("consoleMusic")?.classList.toggle("on", playing);
+        if (!playing) {
+          const tips = document.getElementById("nav-music-hoverTips");
+          if (tips) tips.innerHTML = "音乐已暂停";
+          nav.classList.remove("stretch");
+        }
+        anzhiyu_musicPlaying = playing;
+      };
+      player.on("pause", () => setPlaying(false));
+      player.on("play", () => setPlaying(true));
+    };
+    window.addEventListener("optional-audio-ready", bind);
+    bind();
+    this._navMusicListenerCleanup = () => {
+      window.removeEventListener("optional-audio-ready", bind);
+      clearTimeout(timer);
+    };
   },
   // 音乐伸缩
   musicTelescopic: function () {
@@ -678,15 +872,21 @@ const anzhiyu = {
   },
 
   //音乐上一曲
-  musicSkipBack: function () {
-    navMusicEl.querySelector("meting-js").aplayer.skipBack();
+  musicSkipBack: async function () {
+    const player = await anzhiyu.getNavMusicPlayer();
+    if (!player) return false;
+    player.skipBack();
     rm && rm.hideRightMenu();
+    return true;
   },
 
   //音乐下一曲
-  musicSkipForward: function () {
-    navMusicEl.querySelector("meting-js").aplayer.skipForward();
+  musicSkipForward: async function () {
+    const player = await anzhiyu.getNavMusicPlayer();
+    if (!player) return false;
+    player.skipForward();
     rm && rm.hideRightMenu();
+    return true;
   },
 
   //获取音乐中的名称
@@ -713,30 +913,29 @@ const anzhiyu = {
     // 判断是否为赞赏打开控制台
     consoleEl.classList.add("reward-show");
     anzhiyu.initConsoleState();
+    anzhiyu.syncConsoleAccessibility();
   },
   // 显示中控台
   showConsole: function () {
     consoleEl.classList.add("show");
     anzhiyu.initConsoleState();
+    anzhiyu.syncConsoleAccessibility();
   },
 
   //隐藏中控台
   hideConsole: function () {
-    if (consoleEl.classList.contains("show")) {
+    const panel = document.getElementById("console");
+    if (!panel) return;
+    const focusWasInside = panel.contains(document.activeElement);
+    if (panel.classList.contains("show")) {
       // 如果是一般控制台，就关闭一般控制台
-      consoleEl.classList.remove("show");
-    } else if (consoleEl.classList.contains("reward-show")) {
+      panel.classList.remove("show");
+    } else if (panel.classList.contains("reward-show")) {
       // 如果是打赏控制台，就关闭打赏控制台
-      consoleEl.classList.remove("reward-show");
+      panel.classList.remove("reward-show");
     }
-    // 获取center-console元素
-    const centerConsole = document.getElementById("center-console");
-
-    // 检查center-console是否被选中
-    if (centerConsole.checked) {
-      // 取消选中状态
-      centerConsole.checked = false;
-    }
+    anzhiyu.syncConsoleAccessibility();
+    if (focusWasInside) document.getElementById("center-console")?.focus();
   },
   // 取消加载动画
   hideLoading: function () {
@@ -829,10 +1028,8 @@ const anzhiyu = {
           anzhiyu.changeMusicBg();
 
           // 暂停nav的音乐
-          if (
-            document.querySelector("#nav-music meting-js").aplayer &&
-            !document.querySelector("#nav-music meting-js").aplayer.audio.paused
-          ) {
+          const navPlayer = document.querySelector("#nav-music meting-js")?.aplayer;
+          if (navPlayer && !navPlayer.audio.paused) {
             anzhiyu.musicToggle();
           }
         }
@@ -1002,7 +1199,7 @@ const anzhiyu = {
       const listBtn = navMusic.querySelector(
         "div.aplayer-info > div.aplayer-controller > div.aplayer-time.aplayer-time-narrow > button.aplayer-icon.aplayer-icon-menu svg"
       );
-      if (e.target != listBtn && aplayerList.classList.contains("aplayer-list-hide")) {
+      if (aplayerList && e.target != listBtn && aplayerList.classList.contains("aplayer-list-hide")) {
         aplayerList.classList.remove("aplayer-list-hide");
       }
     });
@@ -1139,10 +1336,10 @@ const anzhiyu = {
 
   // 音乐绑定事件
   musicBindEvent: function () {
-    document.querySelector("#nav-music .aplayer-music").addEventListener("click", function () {
+    document.querySelector("#nav-music .aplayer-music")?.addEventListener("click", function () {
       anzhiyu.musicTelescopic();
     });
-    document.querySelector("#nav-music .aplayer-button").addEventListener("click", function () {
+    document.querySelector("#nav-music .aplayer-button")?.addEventListener("click", function () {
       anzhiyu.musicToggle(false);
     });
   },
@@ -1230,10 +1427,18 @@ const anzhiyu = {
     $htmlDom.contains("hide-aside")
       ? document.querySelector("#consoleHideAside").classList.add("on")
       : document.querySelector("#consoleHideAside").classList.remove("on");
+    const wasFocusedInside = consoleEl.contains(document.activeElement);
     if (consoleEl.classList.contains("show")) {
       consoleEl.classList.remove("show");
     } else {
       consoleEl.classList.add("show");
+    }
+    anzhiyu.syncConsoleAccessibility();
+    if (consoleEl.classList.contains("show")) {
+      const controls = consoleEl.querySelectorAll("button, a[href]");
+      Array.from(controls).find(anzhiyu.isVisibleConsoleControl)?.focus();
+    } else if (wasFocusedInside) {
+      document.getElementById("center-console")?.focus();
     }
     const consoleKeyboard = document.querySelector("#consoleKeyboard");
 

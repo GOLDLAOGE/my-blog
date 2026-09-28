@@ -1,6 +1,6 @@
 #sidebar
   #menu-mask
-  #sidebar-menus
+  #sidebar-menus(inert aria-hidden="true")
     if theme.sidebar && theme.sidebar.site_data
       .sidebar-site-data.site-data.is-center
         if theme.sidebar.site_data.archive
@@ -18,7 +18,7 @@
     if theme.sidebar && theme.sidebar.display_mode
       span.sidebar-menu-item-title=_p("aside.function")
       .sidebar-menu-item
-        a.darkmode_switchbutton.menu-child(href='javascript:void(0);' title=_p("aside.display_mode"))
+        button.darkmode_switchbutton.menu-child(type='button' title=_p("aside.display_mode") aria-label=_p("aside.display_mode"))
           i.anzhiyufont.anzhiyu-icon-circle-half-stroke
           span=_p("aside.display_mode")
     if theme.sidebar && theme.sidebar.nav_menu_project
@@ -47,4 +47,3 @@
             else
               .card-tag-cloud!= cloudTags({source: site.tags, minfontsize: 0.875, maxfontsize: 0.875, limit: tagLimit, unit: 'rem', color: false, highlightTags: theme.aside.card_tags.highlightTags})
           hr
-

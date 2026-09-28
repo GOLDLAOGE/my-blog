@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /api/
+Disallow: /preview/
+
+Sitemap: https://xiax.cafe/sitemap.xml

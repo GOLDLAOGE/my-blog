@@ -158,7 +158,6 @@ var themeColorMeta, pageHeaderEl, navMusicEl, consoleEl;
 
 document.addEventListener("DOMContentLoaded", function () {
   let headerContentWidth, $nav, $rightMenu;
-  let mobileSidebarOpen = false;
 
   const adjustMenu = init => {
     const getAllWidth = ele => {
@@ -188,23 +187,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const initAdjust = () => {
     adjustMenu(true);
     $nav.classList.add("show");
-  };
-
-  // sidebar menus
-  const sidebarFn = {
-    open: () => {
-      anzhiyu.sidebarPaddingR();
-      anzhiyu.animateIn(document.getElementById("menu-mask"), "to_show 0.5s");
-      document.getElementById("sidebar-menus").classList.add("open");
-      mobileSidebarOpen = true;
-    },
-    close: () => {
-      const $body = document.body;
-      $body.style.paddingRight = "";
-      anzhiyu.animateOut(document.getElementById("menu-mask"), "to_hide 0.5s");
-      document.getElementById("sidebar-menus").classList.remove("open");
-      mobileSidebarOpen = false;
-    },
   };
 
   /**
@@ -936,16 +918,6 @@ document.addEventListener("DOMContentLoaded", function () {
   };
 
   /**
-   * 手机端目录点击
-   */
-  const openMobileMenu = () => {
-    const handleClick = () => {
-      sidebarFn.open();
-    };
-    anzhiyu.addEventListenerPjax(document.getElementById("toggle-menu"), "click", handleClick);
-  };
-
-  /**
    * 複製時加上版權信息
    */
   const addCopyright = () => {
@@ -1505,32 +1477,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   };
 
-  // 监听nav是否被其他音频暂停⏸️
-  const listenNavMusicPause = function () {
-    const timer = setInterval(() => {
-      if (navMusicEl && navMusicEl.querySelector("#nav-music meting-js").aplayer) {
-        clearInterval(timer);
-        let msgPlay = '<i class="anzhiyufont anzhiyu-icon-play"></i><span>播放音乐</span>';
-        let msgPause = '<i class="anzhiyufont anzhiyu-icon-pause"></i><span>暂停音乐</span>';
-        navMusicEl.querySelector("#nav-music meting-js").aplayer.on("pause", function () {
-          navMusicEl.classList.remove("playing");
-          document.getElementById("menu-music-toggle").innerHTML = msgPlay;
-          document.getElementById("nav-music-hoverTips").innerHTML = "音乐已暂停";
-          document.querySelector("#consoleMusic").classList.remove("on");
-          anzhiyu_musicPlaying = false;
-          navMusicEl.classList.remove("stretch");
-        });
-        navMusicEl.querySelector("#nav-music meting-js").aplayer.on("play", function () {
-          navMusicEl.classList.add("playing");
-          document.getElementById("menu-music-toggle").innerHTML = msgPause;
-          document.querySelector("#consoleMusic").classList.add("on");
-          anzhiyu_musicPlaying = true;
-          // navMusicEl.classList.add("stretch");
-        });
-      }
-    }, 16);
-  };
-
   // 开发者工具键盘监听
   window.onkeydown = function (e) {
     123 === e.keyCode && anzhiyu.snackbarShow("开发者模式已打开，请遵循GPL协议", !1);
@@ -1749,11 +1695,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const unRefreshFn = function () {
     window.addEventListener("resize", () => {
       adjustMenu(false);
-      mobileSidebarOpen && anzhiyu.isHidden(document.getElementById("toggle-menu")) && sidebarFn.close();
-    });
-
-    document.getElementById("menu-mask").addEventListener("click", e => {
-      sidebarFn.close();
     });
 
     // 处理右键
@@ -1764,7 +1705,6 @@ document.addEventListener("DOMContentLoaded", function () {
     clickFnOfSubMenu();
     GLOBAL_CONFIG.islazyload && lazyloadImg();
     GLOBAL_CONFIG.copyright !== undefined && addCopyright();
-    GLOBAL_CONFIG.navMusic && listenNavMusicPause();
     if (GLOBAL_CONFIG.shortcutKey && document.getElementById("consoleKeyboard")) {
       localStorage.setItem("keyboardToggle", "true");
       document.getElementById("consoleKeyboard").classList.add("on");
@@ -1789,6 +1729,9 @@ document.addEventListener("DOMContentLoaded", function () {
     pageHeaderEl = document.getElementById("page-header");
     navMusicEl = document.getElementById("nav-music");
     consoleEl = document.getElementById("console");
+    anzhiyu.initMobileSidebar();
+    anzhiyu.initConsoleAccessibility();
+    GLOBAL_CONFIG.navMusic && anzhiyu.initNavMusicPauseListener();
 
     addDarkModeEventListener("console", ".darkmode_switchbutton");
 
@@ -1824,9 +1767,6 @@ document.addEventListener("DOMContentLoaded", function () {
     clickFnOfTagHide();
     tabsFn();
     switchComments();
-    document.getElementById("toggle-menu").addEventListener("click", () => {
-      sidebarFn.open();
-    });
 
     // 如果当前页有评论就执行函数
     if (document.getElementById("post-comment")) owoBig();
@@ -1834,7 +1774,6 @@ document.addEventListener("DOMContentLoaded", function () {
     mouseleaveHomeCard();
     coverColor();
     listenToPageInputPress();
-    openMobileMenu();
 
     // needRefresh
     // nav中间的标题变化

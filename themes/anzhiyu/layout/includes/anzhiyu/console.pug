@@ -1,4 +1,4 @@
-#console
+#console(inert aria-hidden="true")
   .console-card-group-reward
     ul.reward-all.console-card
       each item in theme.reward.QR_code
@@ -27,21 +27,21 @@
   .button-group
     if theme.darkmode.enable
       .console-btn-item
-        a.darkmode_switchbutton(title=_p('console.toggle_mode'), href='javascript:void(0);')
+        button.darkmode_switchbutton(type='button' title=_p('console.toggle_mode') aria-label=_p('console.toggle_mode'))
           i.anzhiyufont.anzhiyu-icon-moon
-    .console-btn-item#consoleHideAside(onclick='anzhiyu.hideAsideBtn()', title=_p('console.toggle_aside'))
-      a.asideSwitch
+    .console-btn-item#consoleHideAside
+      button.asideSwitch(type='button' onclick='anzhiyu.hideAsideBtn()' title=_p('console.toggle_aside') aria-label=_p('console.toggle_aside'))
         i.anzhiyufont.anzhiyu-icon-arrows-left-right
     if theme.comment_barrage_config.enable
-      .console-btn-item.on#consoleCommentBarrage(onclick='anzhiyu.switchCommentBarrage()', title=_p('console.toggle_barrage'))
-        a.commentBarrage
+      .console-btn-item.on#consoleCommentBarrage
+        button.commentBarrage(type='button' onclick='anzhiyu.switchCommentBarrage()' title=_p('console.toggle_barrage') aria-label=_p('console.toggle_barrage'))
           i.anzhiyufont.anzhiyu-icon-message
     if theme.nav_music.enable
-      .console-btn-item#consoleMusic(onclick='anzhiyu.musicToggle()', title=_p('console.toggle_music'))
-        a.music-switch
+      .console-btn-item#consoleMusic
+        button.music-switch(type='button' onclick='anzhiyu.musicToggle()' title=_p('console.toggle_music') aria-label=_p('console.toggle_music'))
           i.anzhiyufont.anzhiyu-icon-music
     if theme.shortcutKey.enable
-      .console-btn-item#consoleKeyboard(onclick='anzhiyu.keyboardToggle()', title=_p('console.toggle_keyboard'))
-        a.keyboard-switch
+      .console-btn-item#consoleKeyboard
+        button.keyboard-switch(type='button' onclick='anzhiyu.keyboardToggle()' title=_p('console.toggle_keyboard') aria-label=_p('console.toggle_keyboard'))
           i.anzhiyufont.anzhiyu-icon-keyboard
-  .console-mask(onclick='anzhiyu.hideConsole()', href='javascript:void(0);')
+  button.console-mask(type='button' aria-label=_p('shortcut.toggle_console'))

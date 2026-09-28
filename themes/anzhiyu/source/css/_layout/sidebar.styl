@@ -24,7 +24,7 @@
     width: 300px;
     height: 100%;
     background: var(--anzhiyu-background);
-    transition: all .5s ease 0s;
+    transition: transform .5s ease 0s;
     padding-top: 30px;
     border-left: var(--style-border-always);
     .sidebar-menu-item a.menu-child span
@@ -57,11 +57,10 @@
       flex-direction: column;
       padding: 0 16px;
       margin-bottom: 6px;
-      a.darkmode_switchbutton
-        padding: 4px 8px;
+      button.darkmode_switchbutton
+        padding: 8px;
+        min-height: 44px;
         cursor: pointer;
-        margin: 0;
-        font-size: .9rem;
         color: var(--anzhiyu-fontcolor);
         width: 100%;
         background: var(--anzhiyu-card-bg);
@@ -88,7 +87,10 @@
         border-radius: 8px;
         border: var(--style-border-always);
         background: var(--anzhiyu-card-bg);
-        sup 
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        sup
           opacity: .6;
           margin-left: 4px;
 
@@ -219,6 +221,22 @@ li.card-category-list-item {
   flex-direction: column;
   align-content: space-between;
   border: var(--style-border);
+}
+@media screen and (max-width: 768px) {
+  #aside-content .card-categories ul.card-category-list > .card-category-list-item a {
+    min-height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #menu-mask {
+    animation: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  #sidebar #sidebar-menus {
+    transition: none;
+  }
 }
 #aside-content .card-archives ul.card-archive-list > .card-archive-list-item a span:first-child,
 #aside-content .card-categories ul.card-category-list > .card-category-list-item a span:first-child {

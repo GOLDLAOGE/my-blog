@@ -1,4 +1,4 @@
 - const shareImage = theme.avatar.img === '/img/brand/logo-dark.svg' ? '/img/brand/logo-dark.png' : theme.avatar.img
-.social-share(data-image=url_for(page.cover || shareImage) data-sites= theme.sharejs.sites)
+.social-share(data-image=full_url_for(page.cover || shareImage) data-sites= theme.sharejs.sites)
 link(rel='stylesheet' href=url_for(theme.asset.sharejs_css) media="print" onload="this.media='all'")
 script(src=url_for(theme.asset.sharejs) defer)

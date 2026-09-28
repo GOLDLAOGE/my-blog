@@ -42,7 +42,7 @@ if theme.post_copyright.enable && page.copyright !== false
                   =item.name
                   span.tagsPageCount=item.length
 
-      !=partial('includes/third-party/share/index.pug', {}, {cache: true})
+      !=partial('includes/third-party/share/index.pug')
     else
       .tag_share
         .post-meta__box
@@ -63,4 +63,4 @@ if theme.post_copyright.enable && page.copyright !== false
                   =item.name
                   span.tagsPageCount=item.length
 
-        !=partial('includes/third-party/share/index.pug', {}, {cache: true})
+        !=partial('includes/third-party/share/index.pug')

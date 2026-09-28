@@ -15,6 +15,9 @@
   margin: 0 !important;
   z-index: 2;
 }
+#console[inert] {
+  visibility: hidden;
+}
 #console-music-bg {
   display: none;
 }
@@ -88,6 +91,9 @@
   z-index: -1;
   transition: 0.3s;
   margin: 0px !important;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
 }
 
 #console.show .console-mask,
@@ -209,7 +215,7 @@
   margin-right: 0.5rem;
 }
 
-#console .button-group .console-btn-item a {
+#console .button-group .console-btn-item button {
   width: 100%;
   height: 100%;
   background: var(--card-bg);
@@ -219,12 +225,33 @@
   align-items: center;
   justify-content: center;
   color: var(--anzhiyu-fontcolor);
+  cursor: pointer;
+  padding: 0;
 }
 
-#console .button-group .console-btn-item.on a {
+#console .button-group .console-btn-item.on button {
   background: var(--anzhiyu-orange);
   color: var(--anzhiyu-white);
   transition: 0.3s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #console,
+  #console .console-card-group,
+  #console .console-mask,
+  #console .button-group .console-btn-item {
+    transition: none;
+  }
+  #console .console-card-group,
+  #console.show .console-card-group {
+    transform: none;
+  }
+  #console .console-mask,
+  #console.show .console-mask,
+  #console.reward-show .console-mask {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
 }
 
 .console-card.tags .card-tag-cloud {
@@ -318,7 +345,7 @@
   margin: -4px;
 }
 
-[data-theme="dark"] #console .button-group .console-btn-item a.darkmode_switchbutton {
+[data-theme="dark"] #console .button-group .console-btn-item button.darkmode_switchbutton {
   background: var(--anzhiyu-orange);
   color: var(--anzhiyu-white);
 }
@@ -910,7 +937,7 @@ body:has(#console.show) #nav-music .aplayer .aplayer-lrc .aplayer-lrc-contents {
 }
 
 @media screen and (max-width: 867px) {
-  #center-console:checked + label {
+  #center-console.widget {
     display: none;
   }
   #console .console-card-group {
@@ -948,10 +975,10 @@ body:has(#console.show) #nav-music .aplayer .aplayer-lrc .aplayer-lrc-contents {
 }
 
 @media screen and (min-width: 768px) {
-  #console .button-group .console-btn-item a:hover {
+  #console .button-group .console-btn-item button:hover {
     background: var(--anzhiyu-main) !important;
   }
-  #console .button-group .console-btn-item:hover a {
+  #console .button-group .console-btn-item:hover button {
     background: var(--anzhiyu-main);
     color: var(--anzhiyu-white);
   }
@@ -960,7 +987,7 @@ body:has(#console.show) #nav-music .aplayer .aplayer-lrc .aplayer-lrc-contents {
   body:has(#console.show) #nav-music {
     width: 90%;
   }
-  #center-console + label {
+  #center-console.widget {
     display: none;
   }
 }

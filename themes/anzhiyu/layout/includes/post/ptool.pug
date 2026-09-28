@@ -1,4 +1,6 @@
-- let url = page.copyright_url || page.permalink
+- let url = urlNoIndex()
+- var site_title = page.title || page.tag || page.category || config.title
+- var bg_img = ''
 if !theme.disable_top_img && page.top_img !== false
   if is_post()
     - var top_img = page.top_img || page.cover || page.randomcover
@@ -10,9 +12,7 @@ if !theme.disable_top_img && page.top_img !== false
     - var top_img = page.top_img || theme.default_top_img
 
   if top_img !== false
-    - var imgSource = top_img && top_img.indexOf('/') !== -1 ? url_for(top_img) : top_img
-    - var bg_img = top_img ? imgSource : ''
-    - var site_title = page.title || page.tag || page.category || config.title
+    - bg_img = top_img ? full_url_for(top_img) : ''
 #post-tools.post-tools
   .post-tools-left
     div.rewardLeftButton
@@ -35,7 +35,7 @@ if !theme.disable_top_img && page.top_img !== false
                 .reward-dec 使用手机访问这篇文章
       if theme.ptool.share_weibo
         .share-link.weibo
-          a.share-button(target='_blank' href=`https://service.weibo.com/share/share.php?title=${site_title}&url=${url}&pic=${bg_img}` rel='external nofollow noreferrer noopener')
+          a.share-button(target='_blank' href=`https://service.weibo.com/share/share.php?title=${encodeURIComponent(site_title)}&url=${encodeURIComponent(url)}&pic=${encodeURIComponent(bg_img)}` rel='external nofollow noreferrer noopener')
             i.anzhiyufont.anzhiyu-icon-weibo
       if theme.ptool.share_copyurl
         script.
