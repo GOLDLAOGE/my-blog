@@ -36,7 +36,7 @@ a.categoryButton {
   text-align: left;
   line-height: 4em;
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   color: var(--anzhiyu-white);
   transition: all 0.8s cubic-bezier(0.39, 0.575, 0.565, 1);
   transform: scale(1);
@@ -87,17 +87,6 @@ a.categoryButton.green {
   filter: blur(0);
   top: 15%;
 }
-a.categoryButton:after {
-  top: 47px;
-  width: 1rem;
-  left: 21px;
-  height: 2px;
-  background: var(--anzhiyu-white);
-  content: "";
-  border-radius: 1px;
-  position: absolute;
-}
-
 @media screen and (max-width: 768px) {
   .categoryGroup {
     display: none;

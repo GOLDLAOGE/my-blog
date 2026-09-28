@@ -37,5 +37,8 @@ it('builds actual pages, articles, CSS and assets from the editable payload with
     expect(!!doc.querySelector('#post-firstinfo .article-meta.tags')).toBe(false);
     expect(!!doc.querySelector('#article-container > header a[href^="/tags/"]')).toBe(false);
     const css=html('css/index.css');expect(/--anzhiyu-theme:\s*#123456/i.test(css)).toBe(true);expect(/--anzhiyu-theme:\s*#654321/i.test(css)).toBe(true);
+    const categoryButton = css.match(/a\.categoryButton\s*\{([^}]+)\}/)?.[1];
+    expect(categoryButton).toMatch(/font-size:\s*1\.2rem/);
+    expect(css).not.toMatch(/a\.categoryButton:after\s*\{/);
   }finally{if(hexo)await hexo.exit();rmSync(fixture,{recursive:true,force:true});}
 },30000);
