@@ -124,7 +124,7 @@ favicon: /img/brand/favicon.svg
 # Avatar (头像)
 avatar:
   img: /img/brand/logo-dark.svg
-  effect: true
+  effect: false
 
 # Disable all banner image
 disable_top_img: false
