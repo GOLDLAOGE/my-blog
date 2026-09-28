@@ -1,6 +1,7 @@
 if theme.Open_Graph_meta
   - let contentType = is_post() ? 'article' : 'website'
-  - let metaImage = (page.cover || theme.avatar.img) ? full_url_for(page.cover || theme.avatar.img) : ''
+  - let shareImage = theme.avatar.img === '/img/brand/logo-dark.svg' ? '/img/brand/logo-dark.png' : theme.avatar.img
+  - let metaImage = (page.cover || shareImage) ? full_url_for(page.cover || shareImage) : ''
 
   meta(property="og:type", content=contentType)
   meta(property="og:title", content=pageTitle)
@@ -15,4 +16,3 @@ if theme.Open_Graph_meta
   meta(name="twitter:image", content=metaImage)
 
 meta(name="description" content=page_description())
-

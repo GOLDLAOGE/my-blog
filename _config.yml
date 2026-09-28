@@ -3,17 +3,17 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Hexo
-subtitle: ''
-description: ''
+title: XIAX.CAFE
+subtitle: '写代码，也记录日常。'
+description: '关于前端实践、学习笔记与生活灵感的小小记录空间。'
 keywords: ""
-author: John Doe
-language: en
+author: XIAX.CAFE
+language: zh-CN
 timezone: ''
 
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
-url: https://feature-cms-backend.my-blog-4w1.pages.dev
+url: https://my-blog-4w1.pages.dev
 permalink: :year/:month/:day/:title/
 permalink_defaults:
 pretty_urls:

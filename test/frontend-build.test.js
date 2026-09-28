@@ -15,6 +15,7 @@ it('builds actual pages, articles, CSS and assets from the editable payload with
     symlinkSync(resolve('node_modules'),join(fixture,'node_modules'),'dir');writeFileSync(join(fixture,'package.json'),readFileSync('package.json'));
     mkdirSync(join(fixture,'source/_posts'),{recursive:true});mkdirSync(join(fixture,'source/about'));mkdirSync(join(fixture,'source/link'));mkdirSync(join(fixture,'source/_data'));
     const root=readFileSync('_config.yml','utf8'),theme=readFileSync('themes/anzhiyu/_config.yml','utf8'),settings=readEditableSettings(root,theme);
+    settings.site.title='Hexo';
     Object.assign(settings.theme,{home_top_title:'Fixture home',peoplecanvas_enable:false,theme_color_main:'#123456',theme_color_dark_main:'#654321',display_mode:'dark',
       aside_card_announcement_enable:true,aside_card_announcement_content:'Fixture announcement',aside_card_author_description:'Fixture author',aside_card_weixin_face:'/media/fixture-weixin.webp',runtimeshow_publish_date:'09/27/2026 00:00:00',
       post_copyright_author_href:'https://author.example',post_copyright_license:'Fixture license',post_meta_post_tags:false,toc_post:true,related_post_limit:1});
@@ -29,6 +30,12 @@ it('builds actual pages, articles, CSS and assets from the editable payload with
     const home=html('index.html'),about=html('about/index.html'),links=html('link/index.html'),post=html('2026/01/01/fixture/index.html');
     expect(home).toContain('Fixture home');expect(home).toContain('Fixture announcement');expect(home).toContain('Fixture author');expect(home).toContain('/media/fixture-weixin.webp');expect(home).toContain('href="/categories/fixture/"');
     expect(home).toContain('data-theme="dark"');expect(home).toContain('id="runtimeshow"');
+    const homeDoc=new JSDOM(home).window.document;
+    const recommendation=homeDoc.querySelector('#todayCard');
+    expect(recommendation.querySelector(':scope > a.todayCard-link[href]')).not.toBeNull();
+    const moreRecommendations=recommendation.querySelector('button[type="button"]');
+    expect(moreRecommendations?.textContent).toContain('更多推荐');
+    expect(moreRecommendations.closest('a')).toBeNull();
     expect(about).toContain('<title>Fixture Search Title | Hexo</title>');expect(about).toContain('name="description" content="Fixture SEO"');expect(about).toContain('Fixture Markdown');expect(about).toContain('name="keywords" content="Fixture keyword"');
     expect(!!new JSDOM(about,{url:'https://fixture.test/about/'}).window.document.querySelector('#aside-content')).toBe(false);
     expect(links).toContain('href="https://friend.example"');expect(links).toContain('/media/fixture-friend.webp');

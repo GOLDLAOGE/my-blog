@@ -40,6 +40,9 @@ meta(name="apple-mobile-web-app-status-bar-style", content=themeColor)
 include ./head/Open_Graph.pug
 
 !=favicon_tag(theme.favicon || config.favicon)
+if theme.favicon === '/img/brand/favicon.svg'
+  link(rel='alternate icon' href=url_for('/img/brand/favicon.ico') type='image/x-icon')
+  link(rel='apple-touch-icon' href=url_for('/img/brand/icon-dark.png'))
 link(rel="canonical" href=urlNoIndex())
 
 //- 預解析

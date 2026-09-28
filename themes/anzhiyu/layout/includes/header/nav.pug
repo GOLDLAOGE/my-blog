@@ -15,8 +15,8 @@ nav#nav
                       img.back-menu-item-icon(src=item.icon alt=item.name)
                       span.back-menu-item-text= item.name
       a#site-name(href=url_for('/') accesskey="h")
+        img.site-brand-icon(src=url_for(theme.favicon) alt='' width='32' height='32')
         .title #[=config.title]
-        i.anzhiyufont.anzhiyu-icon-house-chimney
       if (theme.nav.clock)
         !=partial('includes/anzhiyu/clock', {}, {cache: true})
 
@@ -57,5 +57,4 @@ nav#nav
       #toggle-menu
         a.site-page(href='javascript:void(0);' title=_p('nav.toggle_menu'))
           i.anzhiyufont.anzhiyu-icon-bars
-
 

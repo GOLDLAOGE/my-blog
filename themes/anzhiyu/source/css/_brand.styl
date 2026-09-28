@@ -1,0 +1,384 @@
+// XIAX.CAFE: coffee and cream with a jewel-green action accent.
+// Keep --anzhiyu-main free for the article cover's extracted color.
+:root
+  --xiax-coffee: #3d2118
+  --xiax-cream: #fff2d8
+  --xiax-caramel: #80513a
+  --xiax-green: #008653
+  --xiax-green-deep: #006b43
+  --anzhiyu-white: #fff
+  --anzhiyu-white-op: rgba(255, 242, 216, .16)
+  --anzhiyu-wihite-font: #fff2d8
+  --anzhiyu-deep-purple: #006b43
+  --anzhiyu-blue-main: var(--anzhiyu-theme)
+  --anzhiyu-blue-hover: #006b43
+  --anzhiyu-logo-color: #3d2118
+  --anzhiyu-shadow-blue: 0 8px 12px -3px rgba(61, 33, 24, .14)
+  --anzhiyu-shadow-red: 0 8px 12px -3px rgba(128, 81, 58, .14)
+  --anzhiyu-shadow-green: 0 8px 12px -3px rgba(143, 96, 69, .14)
+  --anzhiyu-shadow-black: 0 6px 18px -8px rgba(61, 33, 24, .12)
+  --style-border-avatar: 0 solid transparent
+
+xiaxLight()
+  --xiax-link: #006b43
+  --global-bg: #f7f3eb
+  --font-color: #3d2118
+  --card-bg: #fffcf6
+  --sidebar-bg: #fffcf6
+  --search-bg: #fffcf6
+  --search-input-color: #3d2118
+  --search-result-title: #3d2118
+  --anzhiyu-meta-theme-color: #f7f3eb
+  --anzhiyu-meta-theme-post-color: #fffcf6
+  --anzhiyu-theme-deep: darken($theme-color, 12%)
+  --anzhiyu-theme-op: alpha($theme-color, .12)
+  --anzhiyu-theme-op-deep: alpha($theme-color, .88)
+  --anzhiyu-blue: #006b43
+  --anzhiyu-blue-tint: rgba(0, 134, 83, .10)
+  --anzhiyu-hovertext: #006b43
+  --anzhiyu-fontcolor: #3d2118
+  --anzhiyu-background: #f7f3eb
+  --anzhiyu-secondtext: #786153
+  --anzhiyu-secondbg: #f1e9db
+  --anzhiyu-card-bg: #fffcf6
+  --anzhiyu-card-border: #e6d9c7
+  --anzhiyu-card-btn-bg: #efe3cf
+  --anzhiyu-post-blockquote-bg: #f7efdf
+  --anzhiyu-post-tabs-bg: #f1e9db
+  --anzhiyu-ahoverbg: #f1e9db
+  --anzhiyu-maskbg: rgba(247, 243, 235, .70)
+  --anzhiyu-maskbgdeep: rgba(247, 243, 235, .94)
+  --anzhiyu-scrollbar: #a48c77
+  --blockquote-color: #786153
+  --blockquote-bg: #f7efdf
+  --toc-link-color: #786153
+  --tab-border-color: #e6d9c7
+  --tab-botton-bg: #f1e9db
+  --tab-botton-color: #3d2118
+  --tab-button-hover-bg: #efe3cf
+  --tab-button-active-bg: #fffcf6
+
+xiaxDark()
+  --xiax-link: #57c796
+  --global-bg: #211a16
+  --font-color: #f2e7d6
+  --card-bg: #2c221c
+  --sidebar-bg: #2c221c
+  --search-bg: #2c221c
+  --search-input-color: #f2e7d6
+  --search-result-title: #f2e7d6
+  --anzhiyu-meta-theme-color: #211a16
+  --anzhiyu-meta-theme-post-color: #2c221c
+  --anzhiyu-theme-deep: $theme-dark-color
+  --anzhiyu-theme-op: alpha($theme-dark-color, .15)
+  --anzhiyu-theme-op-deep: #006b43
+  --anzhiyu-blue: #57c796
+  --anzhiyu-blue-tint: rgba(87, 199, 150, .12)
+  --anzhiyu-blue-hover: #85dbb5
+  --anzhiyu-fontcolor: #f2e7d6
+  --anzhiyu-background: #211a16
+  --anzhiyu-secondtext: #c4af99
+  --anzhiyu-secondbg: #382b23
+  --anzhiyu-card-bg: #2c221c
+  --anzhiyu-card-border: #564336
+  --anzhiyu-card-btn-bg: #453428
+  --anzhiyu-post-blockquote-bg: #382b23
+  --anzhiyu-post-tabs-bg: #382b23
+  --anzhiyu-hovertext: #85dbb5
+  --anzhiyu-lighttext: #57c796
+  --anzhiyu-ahoverbg: #453428
+  --anzhiyu-maskbg: rgba(33, 26, 22, .70)
+  --anzhiyu-maskbgdeep: rgba(33, 26, 22, .94)
+  --anzhiyu-scrollbar: #a48c77
+  --blockquote-color: #c4af99
+  --blockquote-bg: #382b23
+  --toc-link-color: #c4af99
+  --tab-border-color: #564336
+  --tab-botton-bg: #382b23
+  --tab-botton-color: #f2e7d6
+  --tab-button-hover-bg: #453428
+  --tab-button-active-bg: #2c221c
+
++schemeLight()
+  xiaxLight()
+[data-theme='light']
+  xiaxLight()
++schemeDark()
+  xiaxDark()
+[data-theme='dark']
+  xiaxDark()
+
+::selection
+  background: var(--xiax-green-deep)
+  color: #fff
+
+a:focus-visible, button:focus-visible, input:focus-visible
+  outline: 2px solid var(--anzhiyu-theme)
+  outline-offset: 4px
+
+#nav #site-name
+  gap: 8px
+  overflow: visible
+
+#nav #site-name .site-brand-icon
+  width: 32px
+  height: 32px
+  border-radius: 8px
+  object-fit: contain
+  flex-shrink: 0
+
+#blog_name #site-name:hover .title
+  opacity: 1
+
+div#post, div#page, div#archive, div#tag, div#category
+  background: var(--anzhiyu-card-bg)
+
+// The cover still supplies the normal hero image; this is visible if it fails.
+if !hexo-config('mainTone.enable')
+  #page-header.post-bg
+    background-color: var(--xiax-coffee)
+
+#random-banner
+  background: var(--xiax-cream)
+  color: var(--xiax-coffee)
+  .banners-title
+    z-index: 1
+    top: 50%
+    left: 2rem
+    transform: translateY(-50%)
+  .banners-title-small
+    color: var(--xiax-caramel)
+  .home-brand-icon
+    position: absolute
+    right: 1.5rem
+    top: 50%
+    transform: translateY(-50%)
+    width: 32%
+    height: 75%
+    object-fit: contain
+  #random-hover
+    z-index: 2
+    background: var(--xiax-coffee)
+    color: var(--xiax-cream)
+  &:hover #random-hover
+    background: var(--xiax-coffee)
+
+.topGroup #todayCard
+  .todayCard-link
+    display: block
+    width: 100%
+    height: 100%
+    &:focus-visible
+      outline-offset: -4px
+  &::after
+    pointer-events: none
+  &.hide
+    visibility: hidden
+  .banner-button-group
+    z-index: 3
+  .banner-button
+    background: var(--xiax-green)
+    color: #fff
+    backdrop-filter: none
+    &:hover
+      background: var(--xiax-green-deep)
+
+a.categoryButton.blue, [data-theme='dark'] a.categoryButton.blue
+  background: var(--xiax-coffee)
+  color: var(--xiax-cream)
+a.categoryButton.red, [data-theme='dark'] a.categoryButton.red
+  background: var(--xiax-green)
+  color: #fff
+a.categoryButton.green, [data-theme='dark'] a.categoryButton.green
+  background: var(--xiax-cream)
+  color: var(--xiax-coffee)
+
+#aside-content > .card-widget.card-info::before
+  background: var(--xiax-coffee)
+  animation: none
+
+#aside-content .card-info .avatar-img
+  width: 112px
+  height: 112px
+  border-radius: 16px
+  object-fit: contain
+  border: 0
+
+#aside-content .card-info .author-info-avatar
+  width: 112px
+  height: 112px
+  margin: 8px auto 24px
+
+#aside-content .card-info
+  .card-content
+    display: flex
+    flex-direction: column
+  .author-info__bottom-group
+    order: 1
+  .author-info__description
+    order: 2
+    position: static
+    opacity: 1
+    padding: 0
+    margin-top: 18px
+    color: var(--xiax-cream)
+    font-size: 14px
+    line-height: 1.7
+  .author-info__desc
+    margin-top: 8px
+    line-height: 1.5
+  &:hover .author-info-avatar
+    opacity: 1
+    transform: none
+  &:hover .author-info-avatar img
+    transform: none
+
+// Keep titles, summaries and metadata in flow instead of reserving empty space.
+#content-inner #recent-posts > .recent-post-item > .recent-post-info
+  display: flex
+  flex-direction: column
+  height: auto
+  min-height: 0
+  padding: 20px 24px
+  .recent-post-info-top
+    padding: 0
+  .recent-post-info-top-tips
+    margin-top: 0
+    margin-bottom: 6px
+  > .content
+    order: 1
+    display: -webkit-box
+    opacity: 1
+    height: auto
+    line-height: 1.65
+    margin-top: 10px
+  > .article-meta-wrap
+    order: 2
+    position: static
+    padding: 0
+    margin-top: 16px
+    gap: 12px
+    color: var(--anzhiyu-secondtext)
+
+@media (max-width: 1200px)
+  #home_top .swiper_container_card
+    flex-direction: column !important
+    gap: 16px
+    overflow: visible
+  #home_top #bannerGroup
+    width: 100%
+    height: auto
+  #home_top .categoryGroup
+    flex-direction: row
+    gap: 10px
+    height: auto
+    margin: 0
+    .categoryItem
+      display: block
+      flex: 1
+      min-width: 0
+      height: 68px
+      margin: 0
+    .categoryButton
+      width: 100%
+      height: 100%
+      padding: 0 16px
+      .categoryButtonText
+        font-size: 19px
+        padding-left: 0
+        white-space: nowrap
+      i
+        font-size: 46px
+        right: -6px
+  #home_top .topGroup
+    width: 100%
+    min-height: 270px
+    gap: 12px
+    display: grid
+    grid-template-columns: repeat(3, minmax(0, 1fr))
+    .todayCard
+      display: flex
+      width: 100%
+      margin: 0
+      background: var(--anzhiyu-card-bg)
+    .recent-post-item
+      display: none
+      width: 100%
+      min-width: 0
+      margin: 0
+      box-shadow: none
+    .article-title
+      font-size: 14px !important
+  #home_top .topGroup .todayCard-info
+    max-width: 65%
+  #home_top .topGroup .todayCard-title
+    font-size: 26px
+    line-height: 1.4
+
+@media (max-width: 768px)
+  #home_top .topGroup
+    min-height: 250px
+    grid-template-columns: repeat(2, minmax(0, 1fr))
+    .todayCard-info
+      left: 20px
+      bottom: 78px
+      max-width: calc(100% - 40px)
+    .todayCard-title
+      font-size: 24px
+    .banner-button-group
+      right: 20px
+      bottom: 20px
+  #content-inner #recent-posts > .recent-post-item > .recent-post-info
+    padding: 20px
+
+#aside-content .card-widget#card-wechat
+  background: var(--xiax-cream)
+  border: 1px solid var(--anzhiyu-card-border)
+
+#loading-box .loading-img
+  border-radius: 16px
+  border: 0
+  object-fit: contain
+#loading-box .loading-image-dot
+  background: var(--xiax-caramel)
+  border-color: var(--xiax-cream)
+
+#article-container .tabs > .nav-tabs > .tab:not(.active):hover
+  background: var(--xiax-green)
+  color: #fff
+
+#article-container a:not([data-fancybox='gallery']):not(.headerlink):not(.cf-friends-link):not(.tag-Link):not(.btn-anzhiyu):not(.no-text-decoration)
+  color: var(--xiax-link)
+  border-bottom-color: var(--xiax-link)
+  &:hover
+    background: var(--xiax-green)
+    color: #fff
+
+.author-content.author-content-item
+  background-image: linear-gradient(120deg, #3d2118, #80513a)
+  animation: none
+
+[data-theme='dark']
+  #page-header.not-top-img > #nav,
+  #page-header.nav-fixed > #nav
+    background: var(--anzhiyu-card-bg)
+  #recent-posts > .recent-post-item
+    background: var(--anzhiyu-card-bg)
+  #aside-content .card-widget#card-wechat
+    background: var(--xiax-cream)
+  img[src*='/img/brand/']
+    filter: none
+  #catalog-list .catalog-list-item.selected a,
+  #catalog-list .catalog-list-item.select a,
+  #catalog-list .catalog-list-item:hover a,
+  #pagination .page-number.current
+    color: var(--xiax-coffee)
+
+@media (min-width: 1201px) and (max-width: 1400px)
+  #random-banner .banners-title-big
+    font-size: 30px
+  #random-banner .banners-title
+    left: 1.5rem
+  #random-banner .home-brand-icon
+    right: .75rem
+    width: 28%

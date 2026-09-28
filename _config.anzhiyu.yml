@@ -1,4 +1,7 @@
-menu: {}
+menu:
+  文章: /archives/
+  分类: /categories/
+  关于: /about/
 
 # nav相关配置
 nav:
@@ -9,13 +12,16 @@ nav:
     - title: 网页
       item:
         - name: 博客
-          link: https://hexo.anheyu.com/
-          icon: /img/favicon.ico
-    - title: 项目
+          link: /
+          icon: /img/brand/favicon.svg
+    - title: 发现
       item:
-        - name: 安知鱼图床
-          link: https://image.anheyu.com/
-          icon: https://image.anheyu.com/favicon.ico
+        - name: 分类
+          link: /categories/
+          icon: /img/brand/icon.svg
+        - name: 关于
+          link: /about/
+          icon: /img/brand/logo.svg
 
 # mourn （哀悼日，指定日期网站简单变灰，不包括滚动条）
 # 注意： 仅网站首页变灰，其他页面正常显示
@@ -113,11 +119,11 @@ katex:
 # --------------------------------------
 
 # Favicon（网站图标）
-favicon: /favicon.ico
+favicon: /img/brand/favicon.svg
 
 # Avatar (头像)
 avatar:
-  img: https://bu.dusays.com/2023/04/27/64496e511b09c.jpg
+  img: /img/brand/logo-dark.svg
   effect: false
 
 # Disable all banner image
@@ -138,10 +144,11 @@ cover:
   # left/right/both
   position: left
   # When cover is not set, the default cover is displayed (当没有设置cover时，默认的封面显示)
-  default_cover: []
+  default_cover:
+    - /img/covers/coffee-reading.webp
 error_img:
   flink: /img/friend_404.gif
-  post_page: /img/404.jpg
+  post_page: /img/covers/coffee-reading.webp
 
 # A simple 404 page
 error_404:
@@ -218,14 +225,8 @@ post_copyright:
 
 # Sponsor/reward
 reward:
-  enable: true
-  QR_code:
-    - img: https://npm.elemecdn.com/anzhiyu-blog@1.1.6/img/post/common/qrcode-weichat.png
-      link:
-      text: 微信
-    - img: https://npm.elemecdn.com/anzhiyu-blog@1.1.6/img/post/common/qrcode-alipay.png
-      link:
-      text: 支付宝
+  enable: false
+  QR_code: []
 
 # Post edit
 # Easily browse and edit blog source code online.
@@ -403,7 +404,7 @@ crisp:
 footer:
   owner:
     enable: true
-    since: 2020
+    since: 2026
   custom_text: ""
   runtime:
     enable: false
@@ -521,22 +522,22 @@ site_verification:
 
 theme_color:
   enable: true
-  main: "#425aef"
-  dark_main: "#f2b94b"
-  paginator: "#425AEF"
-  #   button_hover: "#FF7242"
-  text_selection: "#2128bd"
-  link_color: "var(--anzhiyu-fontcolor)"
+  main: "#008653"
+  dark_main: "#57C796"
+  paginator: "#008653"
+  button_hover: "#006B43"
+  text_selection: "#006B43"
+  link_color: "var(--xiax-link)"
   meta_color: "var(--anzhiyu-fontcolor)"
-  hr_color: "#4259ef23"
+  hr_color: "#3D211823"
   code_foreground: "#fff"
   code_background: "var(--anzhiyu-code-stress)"
-  toc_color: "#425AEF"
-  #   blockquote_padding_color: "#425AEF"
-  #   blockquote_background_color: "#425AEF"
+  toc_color: "#006B43"
+  blockquote_padding_color: "#006B43"
+  blockquote_background_color: "#FFF2D8"
   scrollbar_color: "var(--anzhiyu-scrollbar)"
-  meta_theme_color_light: "#f7f9fe"
-  meta_theme_color_dark: "#18171d"
+  meta_theme_color_light: "#F7F3EB"
+  meta_theme_color_dark: "#211A16"
 
 # 移动端侧栏
 sidebar:
@@ -697,7 +698,7 @@ preloader:
   source: 3
   # pace theme (see https://codebyzach.github.io/pace/)
   pace_css_url:
-  avatar: https://npm.elemecdn.com/anzhiyu-blog-static@1.0.4/img/avatar.jpg # 自定加载动画义头像
+  avatar: /img/brand/icon-dark.svg # 加载动画使用简化品牌图标
 
 # aside (侧边栏)
 # --------------------------------------
@@ -715,16 +716,16 @@ aside:
     category: true
   card_author:
     enable: true
-    description: "" # <div style="line-height:1.38;margin:0.6rem 0;text-align:justify;color:rgba(255, 255, 255, 0.8);">这有关于<b style="color:#fff">产品、设计、开发</b>相关的问题和看法，还有<b style="color:#fff">文章翻译</b>和<b style="color:#fff">分享</b>。</div><div style="line-height:1.38;margin:0.6rem 0;text-align:justify;color:rgba(255, 255, 255, 0.8);">相信你可以在这里找到对你有用的<b style="color:#fff">知识</b>和<b style="color:#fff">教程</b>。</div> # 默认为站点描述
-    name_link: /
+    description: "一杯咖啡的时间，记录开发中的小发现、学习中的新想法，以及值得留住的日常。"
+    name_link: /about/
 
   card_announcement:
     enable: false
     content: 欢迎来看我的博客鸭~
   card_weixin:
-    enable: true
-    face: https://bu.dusays.com/2023/01/13/63c02edf44033.png
-    backFace: https://bu.dusays.com/2023/05/13/645fa415e8694.png
+    enable: false
+    face: /img/brand/logo.svg
+    backFace: /img/brand/icon.svg
   card_recent_post:
     enable: true
     limit: 5 # if set 0 will show all
@@ -746,7 +747,7 @@ aside:
   card_archives:
     enable: true
     type: monthly # yearly or monthly
-    format: MMMM YYYY # eg: YYYY年MM月
+    format: YYYY年MM月 # eg: YYYY年MM月
     order: -1 # Sort of order. 1, asc for ascending; -1, desc for descending
     limit: 8 # if set 0 will show all
     sort_order: # Don't modify the setting unless you know how it works
@@ -767,12 +768,12 @@ busuanzi:
 # Time difference between publish date and now (网页运行时间)
 # Formal: Month/Day/Year Time or Year/Month/Day Time
 runtimeshow:
-  enable: true
+  enable: false
   publish_date: 4/1/2021 00:00:00
 
 # Console - Newest Comments
 newest_comments:
-  enable: true
+  enable: false
   sort_order: # Don't modify the setting unless you know how it works
   limit: 6
   storage: 10 # unit: mins, save data to localStorage
@@ -915,8 +916,8 @@ aplayerInject:
 snackbar:
   enable: true
   position: top-center
-  bg_light: "#425AEF" # The background color of Toast Notification in light mode
-  bg_dark: "#1f1f1f" # The background color of Toast Notification in dark mode
+  bg_light: "#3D2118" # The background color of Toast Notification in light mode
+  bg_dark: "#3D2118" # The background color of Toast Notification in dark mode
 
 # https://instant.page/
 # prefetch (预加载)
@@ -945,11 +946,11 @@ pwa:
   startup_image_enable: true
   manifest: /manifest.json
   theme_color: var(--anzhiyu-main)
-  mask_icon: /img/siteicon/apple-icon-180.png
-  apple_touch_icon: /img/siteicon/apple-icon-180.png
-  bookmark_icon: /img/siteicon/apple-icon-180.png
-  favicon_32_32: /img/siteicon/32.png
-  favicon_16_16: /img/siteicon/16.png
+  mask_icon: /img/brand/favicon.svg
+  apple_touch_icon: /img/brand/icon-dark.png
+  bookmark_icon: /img/brand/icon-dark.png
+  favicon_32_32: /img/brand/favicon.ico
+  favicon_16_16: /img/brand/favicon.ico
 
 # Open graph meta tags
 # https://developers.facebook.com/docs/sharing/webmasters/
@@ -964,7 +965,7 @@ home_top:
   timemode: date #date/updated
   title: 生活明朗
   subTitle: 万物可爱。
-  siteText: anheyu.com
+  siteText: XIAX.CAFE
   category:
     - name: 前端
       path: /categories/前端开发/
@@ -987,10 +988,10 @@ home_top:
     swiper_css: https://npm.elemecdn.com/anzhiyu-theme-static@1.0.0/swiper/swiper.min.css #swiper css依赖
     swiper_js: https://npm.elemecdn.com/anzhiyu-theme-static@1.0.0/swiper/swiper.min.js #swiper js依赖
   banner:
-    tips: 新品主题
-    title: Theme-AnZhiYu
-    image: https://bu.dusays.com/2023/05/13/645fa3cf90d70.webp
-    link: https://docs.anheyu.com/
+    tips: ""
+    title: 给咖啡和阅读留一点空白
+    image: /img/covers/coffee-reading.webp
+    link: /2026/09/28/coffee-and-reading/
 
 # 朋友圈配置
 friends_vue:
@@ -1002,7 +1003,7 @@ friends_vue:
 
     # 深色模式粒子效果canvas
 universe:
-  enable: true
+  enable: false
 
 # 页面卡片顶部气泡升起效果
 bubble:
@@ -1156,7 +1157,7 @@ rightClickMenu:
 
 # 首页随便逛逛people模式 而非技能点模式，关闭后为技能点模式需要配置creativity.yml
 peoplecanvas:
-  enable: true
+  enable: false
   img: https://upload-bbs.miyoushe.com/upload/2024/07/27/125766904/ba62475f396df9de3316a08ed9e65d86_5680958632268053399..png
 
 # 动效

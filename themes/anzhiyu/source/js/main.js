@@ -1277,16 +1277,7 @@ document.addEventListener("DOMContentLoaded", function () {
           );
         }
       } else if (GLOBAL_CONFIG.mainTone.mode == "colorthief") {
-        const colorThief = new ColorThief();
-        bg.crossOrigin = "Anonymous";
-        const getColorFromImage = () => {
-          const rgb = colorThief.getColor(bg);
-          let value = colorHex(`rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`);
-          if (getContrastYIQ(value) === "light") {
-            value = LightenDarkenColor(value, -40);
-          } else {
-            value = LightenDarkenColor(value, 40);
-          }
+        const applyCoverColor = value => {
           root.style.setProperty("--anzhiyu-bar-background", value);
           requestAnimationFrame(() => {
             anzhiyu.initThemeColor();
@@ -1306,9 +1297,34 @@ document.addEventListener("DOMContentLoaded", function () {
               ) + "dd"
             );
           }
-          bg.removeEventListener("load", getColorFromImage);
         };
-        bg.addEventListener("load", getColorFromImage);
+        const useFallbackColor = () => {
+          const style = getComputedStyle(document.documentElement);
+          applyCoverColor(
+            style.getPropertyValue("--xiax-coffee").trim() || style.getPropertyValue("--anzhiyu-theme").trim()
+          );
+        };
+        const getColorFromImage = () => {
+          try {
+            const rgb = new ColorThief().getColor(bg);
+            let value = colorHex(`rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`);
+            if (getContrastYIQ(value) === "light") {
+              value = LightenDarkenColor(value, -40);
+            } else {
+              value = LightenDarkenColor(value, 40);
+            }
+            applyCoverColor(value);
+          } catch {
+            useFallbackColor();
+          }
+        };
+        bg.crossOrigin = "Anonymous";
+        if (bg.complete) {
+          bg.naturalWidth > 0 ? getColorFromImage() : useFallbackColor();
+        } else {
+          bg.addEventListener("load", getColorFromImage, { once: true });
+          bg.addEventListener("error", useFallbackColor, { once: true });
+        }
       } else {
         const fallbackValue = "var(--anzhiyu-theme)";
         let fetchPath = "";
