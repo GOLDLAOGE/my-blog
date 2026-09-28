@@ -1,7 +1,7 @@
 import { renderList } from './lists.js';
 const labels = {
   title:'网站标题', subtitle:'网站副标题', description:'全站 SEO 描述', keywords:'全站关键词', author:'作者', language:'语言（如 zh-CN）', url:'正式网站网址',
-  favicon:'网站图标', avatar_img:'头像图片', avatar_effect:'头像旋转', nav_enable:'启用顶部导航', nav_travelling:'启用开往链接', nav_clock:'显示时钟',
+  favicon:'网站图标', avatar_img:'头像图片', avatar_effect:'头像旋转', nav_enable:'启用顶部导航', nav_travelling:'启用开往链接',
   index_img:'首页顶部图片', default_top_img:'默认顶部图片', disable_top_img:'禁用顶部图片', cover_default:'默认文章封面（每行一张）', cover_index:'首页显示封面', cover_aside:'侧栏显示封面',
   subtitle_enable:'显示首页副标题', subtitle_effect:'副标题打字效果', subtitle_loop:'循环打字', subtitle_sub:'副标题文字（每行一句）', subtitle_type_speed:'打字间隔（毫秒）', subtitle_back_speed:'删除间隔（毫秒）',
   footer_owner_enable:'显示版权信息', footer_since:'版权起始年份', footer_custom_text:'页脚自定义内容（支持 HTML）', footer_runtime_enable:'显示运行时间', footer_launch_time:'上线时间（MM/DD/YYYY HH:mm:ss）',
@@ -11,7 +11,7 @@ export function settingsGroups(schema) {
   const definitions = [
     ['basic', '基础配置', '网站身份与全站 SEO', 'site', schema.site, []],
     ['identity', '图标与头像', '网站标识与个人头像', 'theme', ['favicon','avatar_img','avatar_effect'], []],
-    ['links', '导航与链接', '顶部导航、主菜单与社交入口', 'theme', ['nav_enable','nav_travelling','nav_clock'], ['menu','navigation','social']],
+    ['links', '导航与链接', '顶部导航、主菜单与社交入口', 'theme', ['nav_enable','nav_travelling'], ['menu','navigation','social']],
     ['home', '首页配置', '首页图片与副标题效果', 'theme', ['index_img','default_top_img','disable_top_img','subtitle_enable','subtitle_effect','subtitle_loop','subtitle_sub','subtitle_type_speed','subtitle_back_speed'], []],
     ['covers', '文章封面', '默认封面及列表展示位置', 'theme', ['cover_default','cover_index','cover_aside'], []],
     ['footer', '页脚配置', '版权信息与网站运行时间', 'theme', ['footer_owner_enable','footer_since','footer_custom_text','footer_runtime_enable','footer_launch_time'], []],

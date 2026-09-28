@@ -6,7 +6,7 @@ import { readRows, writeRows } from './structured-lists.js';
 export const SITE_FIELDS = ['title', 'subtitle', 'description', 'keywords', 'author', 'language', 'url'];
 export const THEME_FIELDS = {
   favicon: ['favicon', 'url'], avatar_img: ['avatar.img', 'url'], avatar_effect: ['avatar.effect', 'boolean'],
-  nav_enable: ['nav.enable', 'boolean'], nav_travelling: ['nav.travelling', 'boolean'], nav_clock: ['nav.clock', 'boolean'],
+  nav_enable: ['nav.enable', 'boolean'], nav_travelling: ['nav.travelling', 'boolean'],
   index_img: ['index_img', 'image'], default_top_img: ['default_top_img', 'image'], disable_top_img: ['disable_top_img', 'boolean'],
   cover_default: ['cover.default_cover', 'urls'], cover_index: ['cover.index_enable', 'boolean'], cover_aside: ['cover.aside_enable', 'boolean'],
   subtitle_enable: ['subtitle.enable', 'boolean'], subtitle_effect: ['subtitle.effect', 'boolean'], subtitle_loop: ['subtitle.loop', 'boolean'],
@@ -16,7 +16,7 @@ export const THEME_FIELDS = {
   error_404_enable: ['error_404.enable', 'boolean'], error_404_subtitle: ['error_404.subtitle', 'text'], error_404_background: ['error_404.background', 'url'],
   ...SETTINGS_SCHEMA.theme,
 };
-const legacyDefaults = { avatar_effect:false, nav_enable:false, nav_travelling:false, nav_clock:false, disable_top_img:false,
+const legacyDefaults = { avatar_effect:false, nav_enable:false, nav_travelling:false, disable_top_img:false,
   cover_index:true,cover_aside:true,subtitle_enable:false,subtitle_effect:true,subtitle_loop:true,subtitle_type_speed:150,subtitle_back_speed:50,
   footer_owner_enable:true,footer_since:2020,footer_runtime_enable:false,footer_launch_time:'04/01/2021 00:00:00',error_404_enable:true,
   error_404_subtitle:'请尝试站内搜索寻找文章',error_404_background:'https://bu.dusays.com/2023/05/08/645907596997d.gif',

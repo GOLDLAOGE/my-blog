@@ -253,6 +253,7 @@ window.addEventListener("load", () => {
         }
         str += "</div>";
         $resultContent.innerHTML = str;
+        anzhiyu.loadLightbox([]);
         if (keywords[0] !== "") $loadingStatus.innerHTML = "";
         window.pjax && window.pjax.refresh($resultContent);
       });

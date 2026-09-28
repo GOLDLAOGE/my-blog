@@ -1,9 +1,5 @@
-// 第一次播放音乐
-var anzhiyu_musicFirst = false;
 // 快捷键
 var anzhiyu_keyboard = null;
-// 音乐播放状态
-var anzhiyu_musicPlaying = false;
 var $bodyWrap = document.getElementById("body-wrap");
 var anzhiyu_intype = false;
 var anzhiyu_keyUpEvent_timeoutId = null;
@@ -146,15 +142,7 @@ var vegetablesAndFruits = [
   "火龙果",
 ];
 
-// 已随机的歌曲
-var selectRandomSong = [];
-// 音乐默认声音大小
-var musicVolume = 0.8;
-// 是否切换了周杰伦音乐列表
-var changeMusicListFlag = false;
-// 当前默认播放列表
-var defaultPlayMusicList = [];
-var themeColorMeta, pageHeaderEl, navMusicEl, consoleEl;
+var themeColorMeta, pageHeaderEl, consoleEl;
 
 document.addEventListener("DOMContentLoaded", function () {
   let headerContentWidth, $nav, $rightMenu;
@@ -504,8 +492,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // 第一次滑动到底部的标识符
     let scrollBottomFirstFlag = false;
     // 缓存常用dom元素
-    const musicDom = document.getElementById("nav-music"),
-      footerDom = document.getElementById("footer"),
+    const footerDom = document.getElementById("footer"),
       waterfallDom = document.getElementById("waterfall"),
       $percentBtn = document.getElementById("percent"),
       $navTotop = document.getElementById("nav-totop"),
@@ -552,11 +539,11 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!scrollBottomFirstFlag && waterfallResult + 100 >= document.documentElement.clientHeight) {
           console.info(waterfallResult, document.documentElement.clientHeight);
           setTimeout(() => {
-            waterfall("#waterfall");
+            waterfallDom.isConnected && typeof window.waterfall === "function" && waterfall(waterfallDom);
           }, 500);
         } else {
           setTimeout(() => {
-            waterfallDom && waterfall("#waterfall");
+            waterfallDom.isConnected && typeof window.waterfall === "function" && waterfall(waterfallDom);
           }, 500);
         }
       }
@@ -634,22 +621,12 @@ document.addEventListener("DOMContentLoaded", function () {
       percentageScrollFn(currentTop);
     }, 96);
 
-    // 进入footer隐藏音乐
+    // 记录第一次到达页脚
     if (footerDom) {
       anzhiyu
         .intersectionObserver(
           () => {
-            if (footerDom && musicDom && 768 < document.body.clientWidth) {
-              musicDom.style.bottom = "-10px";
-              musicDom.style.opacity = "0";
-            }
             scrollBottomFirstFlag = true;
-          },
-          () => {
-            if (footerDom && musicDom && 768 < document.body.clientWidth) {
-              musicDom.style.bottom = "20px";
-              musicDom.style.opacity = "1";
-            }
           }
         )()
         .observe(footerDom);
@@ -1609,9 +1586,6 @@ document.addEventListener("DOMContentLoaded", function () {
             case 65:
               anzhiyu.switchConsole();
               break;
-            case 77:
-              anzhiyu.musicToggle();
-              break;
             case 75:
               anzhiyu.keyboardToggle();
               break;
@@ -1727,11 +1701,9 @@ document.addEventListener("DOMContentLoaded", function () {
     initAdjust();
     themeColorMeta = document.querySelector('meta[name="theme-color"]');
     pageHeaderEl = document.getElementById("page-header");
-    navMusicEl = document.getElementById("nav-music");
     consoleEl = document.getElementById("console");
     anzhiyu.initMobileSidebar();
     anzhiyu.initConsoleAccessibility();
-    GLOBAL_CONFIG.navMusic && anzhiyu.initNavMusicPauseListener();
 
     addDarkModeEventListener("console", ".darkmode_switchbutton");
 
@@ -1793,8 +1765,6 @@ document.addEventListener("DOMContentLoaded", function () {
     anzhiyu.categoriesBarActive();
     anzhiyu.topCategoriesBarScroll();
     anzhiyu.switchRightClickMenuHotReview();
-    anzhiyu.getCustomPlayList();
-    anzhiyu.addEventListenerConsoleMusicList(false);
     anzhiyu.initPaginationObserver();
 
     setTimeout(() => {

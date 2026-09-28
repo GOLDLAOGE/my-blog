@@ -5,6 +5,8 @@ import { parse } from 'yaml';
 import { readEditableSettings, writeEditableSettings } from '../functions/_lib/settings.js';
 import { writeFriendLinks } from '../functions/_lib/pages.js';
 const require = createRequire(import.meta.url), pug = require('pug');
+// Responsive variants are tested separately; arbitrary CMS assets keep their URL.
+const cover_srcset = () => undefined;
 function settingsLocals(change) {
   const root=readFileSync('_config.yml','utf8'),source=readFileSync('themes/anzhiyu/_config.yml','utf8');
   const settings=readEditableSettings(root,source);change(settings);
@@ -13,7 +15,7 @@ function settingsLocals(change) {
 }
 it('renders saved home text, classification links and banner assets with their conditions',()=>{
   const locals=settingsLocals(s=>{s.theme.peoplecanvas_enable=false;s.theme.home_top_title='My home';s.theme.home_top_banner_image='/media/banner.webp';s.lists.home_top_category=[{name:'Coding',path:'/categories/coding/',icon:'anzhiyu-icon-link',class:'green'}];});
-  const render=()=>pug.renderFile('themes/anzhiyu/layout/includes/top/top.pug',locals);
+  const render=()=>pug.renderFile('themes/anzhiyu/layout/includes/top/top.pug',{...locals,cover_srcset});
   expect(render()).toContain('My home');expect(render()).toContain('href="/categories/coding/"');expect(render()).toContain('src="/media/banner.webp"');
   locals.theme.peoplecanvas.enable=true;expect(render()).not.toContain('My home');expect(render()).toContain('id="peoplecanvas"');
   locals.theme.home_top.enable=false;expect(render()).not.toContain('id="home_top"');

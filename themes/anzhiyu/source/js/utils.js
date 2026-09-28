@@ -335,7 +335,19 @@ const anzhiyu = {
         }
       });
 
-      if (!window.fancyboxRun) {
+      if (!document.querySelector("[data-fancybox]") || window.fancyboxRun) return;
+      if (!anzhiyu.loadLightbox.loading) {
+        const source = GLOBAL_CONFIG.source.fancybox;
+        anzhiyu.loadLightbox.loading = Promise.all([
+          getCSS(source.css),
+          window.Fancybox ? Promise.resolve() : getScript(source.js),
+        ]).then(() => true).catch(() => {
+          anzhiyu.loadLightbox.loading = null;
+          return false;
+        });
+      }
+      return anzhiyu.loadLightbox.loading.then(loaded => {
+        if (!loaded || !window.Fancybox || window.fancyboxRun || !document.querySelector("[data-fancybox]")) return;
         Fancybox.bind("[data-fancybox]", {
           Hash: false,
           Thumbs: {
@@ -343,7 +355,7 @@ const anzhiyu = {
           },
         });
         window.fancyboxRun = true;
-      }
+      });
     }
   },
 
@@ -717,12 +729,21 @@ const anzhiyu = {
   // 刷新瀑布流
   reflashEssayWaterFall: function () {
     const waterfallEl = document.getElementById("waterfall");
-    if (waterfallEl) {
+    if (!waterfallEl) return;
+    const run = () => {
       setTimeout(function () {
-        waterfall(waterfallEl);
+        if (!waterfallEl.isConnected) return;
+        typeof window.waterfall === "function" && waterfall(waterfallEl);
         waterfallEl.classList.add("show");
       }, 800);
+    };
+    if (typeof window.waterfall === "function") return run();
+    if (!anzhiyu.reflashEssayWaterFall.loading) {
+      anzhiyu.reflashEssayWaterFall.loading = getScript(GLOBAL_CONFIG.source.waterfall).catch(() => {
+        anzhiyu.reflashEssayWaterFall.loading = null;
+      });
     }
+    return anzhiyu.reflashEssayWaterFall.loading.then(run);
   },
   sayhi: function () {
     const $sayhiEl = document.getElementById("author-info__sayhi");
@@ -770,134 +791,6 @@ const anzhiyu = {
     if (!config[configKey]) return defaultValue;
     return config[configKey];
   },
-  //切换音乐播放状态
-  musicToggle: async function (changePaly = true) {
-    const player = changePaly
-      ? await anzhiyu.getNavMusicPlayer()
-      : document.querySelector("#nav-music meting-js")?.aplayer;
-    navMusicEl = document.getElementById("nav-music");
-    if (!player || !navMusicEl) return false;
-    if (!anzhiyu_musicFirst) {
-      anzhiyu.musicBindEvent();
-      anzhiyu_musicFirst = true;
-    }
-    let msgPlay = '<i class="anzhiyufont anzhiyu-icon-play"></i><span>播放音乐</span>';
-    let msgPause = '<i class="anzhiyufont anzhiyu-icon-pause"></i><span>暂停音乐</span>';
-    if (anzhiyu_musicPlaying) {
-      navMusicEl.classList.remove("playing");
-      const menu = document.getElementById("menu-music-toggle");
-      if (menu) menu.innerHTML = msgPlay;
-      const tips = document.getElementById("nav-music-hoverTips");
-      if (tips) tips.innerHTML = "音乐已暂停";
-      document.querySelector("#consoleMusic")?.classList.remove("on");
-      anzhiyu_musicPlaying = false;
-      navMusicEl.classList.remove("stretch");
-    } else {
-      navMusicEl.classList.add("playing");
-      const menu = document.getElementById("menu-music-toggle");
-      if (menu) menu.innerHTML = msgPause;
-      document.querySelector("#consoleMusic")?.classList.add("on");
-      anzhiyu_musicPlaying = true;
-      navMusicEl.classList.add("stretch");
-    }
-    if (changePaly) player.toggle();
-    rm && rm.hideRightMenu();
-    return true;
-  },
-  getNavMusicPlayer: async function () {
-    if (typeof window.ensureOptionalAudio === "function" && !(await window.ensureOptionalAudio())) return null;
-    let player = document.querySelector("#nav-music meting-js")?.aplayer;
-    if (player || !document.querySelector("#nav-music meting-js")) return player || null;
-    return new Promise(resolve => {
-      let attempts = 0;
-      const check = () => {
-        player = document.querySelector("#nav-music meting-js")?.aplayer;
-        if (player || ++attempts >= 50) resolve(player || null);
-        else setTimeout(check, 100);
-      };
-      check();
-    });
-  },
-  initNavMusicPauseListener: function () {
-    if (this._navMusicListenerCleanup) this._navMusicListenerCleanup();
-    let timer;
-    const bind = () => {
-      clearTimeout(timer);
-      const nav = document.getElementById("nav-music");
-      const meting = nav?.querySelector("meting-js");
-      if (!meting) return;
-      const player = meting.aplayer;
-      if (!player) {
-        let attempts = 0;
-        const retry = () => {
-          if (meting.aplayer) bind();
-          else if (++attempts < 50) timer = setTimeout(retry, 100);
-        };
-        timer = setTimeout(retry, 100);
-        return;
-      }
-      if (player._anzhiyuNavBound) return;
-      player._anzhiyuNavBound = true;
-      const setPlaying = playing => {
-        nav.classList.toggle("playing", playing);
-        const menu = document.getElementById("menu-music-toggle");
-        if (menu) menu.innerHTML = playing
-          ? '<i class="anzhiyufont anzhiyu-icon-pause"></i><span>暂停音乐</span>'
-          : '<i class="anzhiyufont anzhiyu-icon-play"></i><span>播放音乐</span>';
-        document.getElementById("consoleMusic")?.classList.toggle("on", playing);
-        if (!playing) {
-          const tips = document.getElementById("nav-music-hoverTips");
-          if (tips) tips.innerHTML = "音乐已暂停";
-          nav.classList.remove("stretch");
-        }
-        anzhiyu_musicPlaying = playing;
-      };
-      player.on("pause", () => setPlaying(false));
-      player.on("play", () => setPlaying(true));
-    };
-    window.addEventListener("optional-audio-ready", bind);
-    bind();
-    this._navMusicListenerCleanup = () => {
-      window.removeEventListener("optional-audio-ready", bind);
-      clearTimeout(timer);
-    };
-  },
-  // 音乐伸缩
-  musicTelescopic: function () {
-    if (navMusicEl.classList.contains("stretch")) {
-      navMusicEl.classList.remove("stretch");
-    } else {
-      navMusicEl.classList.add("stretch");
-    }
-  },
-
-  //音乐上一曲
-  musicSkipBack: async function () {
-    const player = await anzhiyu.getNavMusicPlayer();
-    if (!player) return false;
-    player.skipBack();
-    rm && rm.hideRightMenu();
-    return true;
-  },
-
-  //音乐下一曲
-  musicSkipForward: async function () {
-    const player = await anzhiyu.getNavMusicPlayer();
-    if (!player) return false;
-    player.skipForward();
-    rm && rm.hideRightMenu();
-    return true;
-  },
-
-  //获取音乐中的名称
-  musicGetName: function () {
-    var x = document.querySelectorAll(".aplayer-title");
-    var arr = [];
-    for (var i = x.length - 1; i >= 0; i--) {
-      arr[i] = x[i].innerText;
-    }
-    return arr[0];
-  },
 
   //初始化console图标
   initConsoleState: function () {
@@ -939,120 +832,7 @@ const anzhiyu = {
   },
   // 取消加载动画
   hideLoading: function () {
-    document.getElementById("loading-box").classList.add("loaded");
-  },
-  // 将音乐缓存播放
-  cacheAndPlayMusic() {
-    let data = localStorage.getItem("musicData");
-    if (data) {
-      data = JSON.parse(data);
-      const currentTime = new Date().getTime();
-      if (currentTime - data.timestamp < 24 * 60 * 60 * 1000) {
-        // 如果缓存的数据没有过期，直接使用
-        anzhiyu.playMusic(data.songs);
-        return;
-      }
-    }
-
-    // 否则重新从服务器获取数据
-    fetch("/json/music.json")
-      .then(response => response.json())
-      .then(songs => {
-        const cacheData = {
-          timestamp: new Date().getTime(),
-          songs: songs,
-        };
-        localStorage.setItem("musicData", JSON.stringify(cacheData));
-        anzhiyu.playMusic(songs);
-      });
-  },
-  // 播放音乐
-  playMusic(songs) {
-    const anMusicPage = document.getElementById("anMusic-page");
-    const metingAplayer = anMusicPage.querySelector("meting-js").aplayer;
-    const randomIndex = Math.floor(Math.random() * songs.length);
-    const randomSong = songs[randomIndex];
-    const allAudios = metingAplayer.list.audios;
-    if (!selectRandomSong.includes(randomSong.name)) {
-      // 如果随机到的歌曲已经未被随机到过，就添加进metingAplayer.list
-      metingAplayer.list.add([randomSong]);
-      // 播放最后一首(因为是添加到了最后)
-      metingAplayer.list.switch(allAudios.length);
-      // 添加到已被随机的歌曲列表
-      selectRandomSong.push(randomSong.name);
-    } else {
-      // 随机到的歌曲已经在播放列表中了
-      // 直接继续随机直到随机到没有随机过的歌曲，如果全部随机过了就切换到对应的歌曲播放即可
-      let songFound = false;
-      while (!songFound) {
-        const newRandomIndex = Math.floor(Math.random() * songs.length);
-        const newRandomSong = songs[newRandomIndex];
-        if (!selectRandomSong.includes(newRandomSong.name)) {
-          metingAplayer.list.add([newRandomSong]);
-          metingAplayer.list.switch(allAudios.length);
-          selectRandomSong.push(newRandomSong.name);
-          songFound = true;
-        }
-        // 如果全部歌曲都已被随机过，跳出循环
-        if (selectRandomSong.length === songs.length) {
-          break;
-        }
-      }
-      if (!songFound) {
-        // 如果全部歌曲都已被随机过，切换到对应的歌曲播放
-        const palyMusicIndex = allAudios.findIndex(song => song.name === randomSong.name);
-        if (palyMusicIndex != -1) metingAplayer.list.switch(palyMusicIndex);
-      }
-    }
-
-    console.info("已随机歌曲：", selectRandomSong, "本次随机歌曲：", randomSong.name);
-  },
-  // 音乐节目切换背景
-  changeMusicBg: function (isChangeBg = true) {
-    const anMusicBg = document.getElementById("an_music_bg");
-
-    if (isChangeBg) {
-      // player listswitch 会进入此处
-      const musiccover = document.querySelector("#anMusic-page .aplayer-pic");
-      anMusicBg.style.backgroundImage = musiccover.style.backgroundImage;
-    } else {
-      // 第一次进入，绑定事件，改背景
-      let timer = setInterval(() => {
-        const musiccover = document.querySelector("#anMusic-page .aplayer-pic");
-        // 确保player加载完成
-        if (musiccover) {
-          clearInterval(timer);
-          // 绑定事件
-          anzhiyu.addEventListenerMusic();
-          // 确保第一次能够正确替换背景
-          anzhiyu.changeMusicBg();
-
-          // 暂停nav的音乐
-          const navPlayer = document.querySelector("#nav-music meting-js")?.aplayer;
-          if (navPlayer && !navPlayer.audio.paused) {
-            anzhiyu.musicToggle();
-          }
-        }
-      }, 100);
-    }
-  },
-  // 获取自定义播放列表
-  getCustomPlayList: function () {
-    if (!window.location.pathname.startsWith("/music/")) {
-      return;
-    }
-    const urlParams = new URLSearchParams(window.location.search);
-    const userId = "8152976493";
-    const userServer = "netease";
-    const anMusicPageMeting = document.getElementById("anMusic-page-meting");
-    if (urlParams.get("id") && urlParams.get("server")) {
-      const id = urlParams.get("id");
-      const server = urlParams.get("server");
-      anMusicPageMeting.innerHTML = `<meting-js id="${id}" server=${server} type="playlist" type="playlist" mutex="true" preload="auto" theme="var(--anzhiyu-main)" order="list" list-max-height="calc(100vh - 169px)!important"></meting-js>`;
-    } else {
-      anMusicPageMeting.innerHTML = `<meting-js id="${userId}" server="${userServer}" type="playlist" mutex="true" preload="auto" theme="var(--anzhiyu-main)" order="list" list-max-height="calc(100vh - 169px)!important"></meting-js>`;
-    }
-    anzhiyu.changeMusicBg(false);
+    document.getElementById("loading-box")?.classList.add("loaded");
   },
   //隐藏今日推荐
   hideTodayCard: function () {
@@ -1066,144 +846,6 @@ const anzhiyu = {
     }
   },
 
-  // 监听音乐背景改变
-  addEventListenerMusic: function () {
-    const anMusicPage = document.getElementById("anMusic-page");
-    const aplayerIconMenu = anMusicPage.querySelector(".aplayer-info .aplayer-time .aplayer-icon-menu");
-    const anMusicBtnGetSong = anMusicPage.querySelector("#anMusicBtnGetSong");
-    const anMusicRefreshBtn = anMusicPage.querySelector("#anMusicRefreshBtn");
-    const anMusicSwitchingBtn = anMusicPage.querySelector("#anMusicSwitching");
-    const metingAplayer = anMusicPage.querySelector("meting-js").aplayer;
-    //初始化音量
-    metingAplayer.volume(0.8, true);
-    metingAplayer.on("loadeddata", function () {
-      anzhiyu.changeMusicBg();
-    });
-
-    aplayerIconMenu.addEventListener("click", function () {
-      document.getElementById("menu-mask").style.display = "block";
-      document.getElementById("menu-mask").style.animation = "0.5s ease 0s 1 normal none running to_show";
-      anMusicPage.querySelector(".aplayer.aplayer-withlist .aplayer-list").style.opacity = "1";
-    });
-
-    function anMusicPageMenuAask() {
-      if (window.location.pathname != "/music/") {
-        document.getElementById("menu-mask").removeEventListener("click", anMusicPageMenuAask);
-        return;
-      }
-
-      anMusicPage.querySelector(".aplayer-list").classList.remove("aplayer-list-hide");
-    }
-
-    document.getElementById("menu-mask").addEventListener("click", anMusicPageMenuAask);
-
-    // 监听增加单曲按钮
-    anMusicBtnGetSong.addEventListener("click", () => {
-      if (changeMusicListFlag) {
-        const anMusicPage = document.getElementById("anMusic-page");
-        const metingAplayer = anMusicPage.querySelector("meting-js").aplayer;
-        const allAudios = metingAplayer.list.audios;
-        const randomIndex = Math.floor(Math.random() * allAudios.length);
-        // 随机播放一首
-        metingAplayer.list.switch(randomIndex);
-      } else {
-        anzhiyu.cacheAndPlayMusic();
-      }
-    });
-    anMusicRefreshBtn.addEventListener("click", () => {
-      localStorage.removeItem("musicData");
-      anzhiyu.snackbarShow("已移除相关缓存歌曲");
-    });
-    anMusicSwitchingBtn.addEventListener("click", () => {
-      anzhiyu.changeMusicList();
-    });
-
-    // 默认加载的歌单
-    if (GLOBAL_CONFIG.music_page_default === "custom") {
-      anzhiyu.changeMusicList();
-    }
-
-    // 监听键盘事件
-    //空格控制音乐
-    document.addEventListener("keydown", function (event) {
-      //暂停开启音乐
-      if (event.code === "Space") {
-        event.preventDefault();
-        metingAplayer.toggle();
-      }
-      //切换下一曲
-      if (event.keyCode === 39) {
-        event.preventDefault();
-        metingAplayer.skipForward();
-      }
-      //切换上一曲
-      if (event.keyCode === 37) {
-        event.preventDefault();
-        metingAplayer.skipBack();
-      }
-      //增加音量
-      if (event.keyCode === 38) {
-        if (musicVolume <= 1) {
-          musicVolume += 0.1;
-          metingAplayer.volume(musicVolume, true);
-        }
-      }
-      //减小音量
-      if (event.keyCode === 40) {
-        if (musicVolume >= 0) {
-          musicVolume += -0.1;
-          metingAplayer.volume(musicVolume, true);
-        }
-      }
-    });
-  },
-  // 切换歌单
-  changeMusicList: async function () {
-    const anMusicPage = document.getElementById("anMusic-page");
-    const metingAplayer = anMusicPage.querySelector("meting-js").aplayer;
-    const currentTime = new Date().getTime();
-    const cacheData = JSON.parse(localStorage.getItem("musicData")) || { timestamp: 0 };
-    let songs = [];
-
-    if (changeMusicListFlag) {
-      songs = defaultPlayMusicList;
-    } else {
-      // 保存当前默认播放列表，以使下次可以切换回来
-      defaultPlayMusicList = metingAplayer.list.audios;
-      // 如果缓存的数据没有过期，直接使用
-      if (currentTime - cacheData.timestamp < 24 * 60 * 60 * 1000) {
-        songs = cacheData.songs;
-      } else {
-        // 否则重新从服务器获取数据
-        const response = await fetch("/json/music.json");
-        songs = await response.json();
-        cacheData.timestamp = currentTime;
-        cacheData.songs = songs;
-        localStorage.setItem("musicData", JSON.stringify(cacheData));
-      }
-    }
-
-    // 清除当前播放列表并添加新的歌曲
-    metingAplayer.list.clear();
-    metingAplayer.list.add(songs);
-
-    // 切换标志位
-    changeMusicListFlag = !changeMusicListFlag;
-  },
-  // 控制台音乐列表监听
-  addEventListenerConsoleMusicList: function () {
-    const navMusic = document.getElementById("nav-music");
-    if (!navMusic) return;
-    navMusic.addEventListener("click", e => {
-      const aplayerList = navMusic.querySelector(".aplayer-list");
-      const listBtn = navMusic.querySelector(
-        "div.aplayer-info > div.aplayer-controller > div.aplayer-time.aplayer-time-narrow > button.aplayer-icon.aplayer-icon-menu svg"
-      );
-      if (aplayerList && e.target != listBtn && aplayerList.classList.contains("aplayer-list-hide")) {
-        aplayerList.classList.remove("aplayer-list-hide");
-      }
-    });
-  },
   // 监听按键 - 页码跳转
   toPage: function () {
     var toPageText = document.getElementById("toPageText"),
@@ -1334,15 +976,6 @@ const anzhiyu = {
     return e.split(n).join(t);
   },
 
-  // 音乐绑定事件
-  musicBindEvent: function () {
-    document.querySelector("#nav-music .aplayer-music")?.addEventListener("click", function () {
-      anzhiyu.musicTelescopic();
-    });
-    document.querySelector("#nav-music .aplayer-button")?.addEventListener("click", function () {
-      anzhiyu.musicToggle(false);
-    });
-  },
 
   // 判断是否是移动端
   hasMobile: function () {
@@ -1361,17 +994,29 @@ const anzhiyu = {
 
   // 创建二维码
   qrcodeCreate: function () {
-    if (document.getElementById("qrcode")) {
-      document.getElementById("qrcode").innerHTML = "";
-      var qrcode = new QRCode(document.getElementById("qrcode"), {
-        text: window.location.href,
+    const element = document.getElementById("qrcode");
+    if (!element) return;
+    const render = () => {
+      const url = window.location.href;
+      if (!element.isConnected || !window.QRCode || element.dataset.qrcodeUrl === url) return;
+      element.innerHTML = "";
+      new QRCode(element, {
+        text: url,
         width: 250,
         height: 250,
         colorDark: "#000",
         colorLight: "#ffffff",
         correctLevel: QRCode.CorrectLevel.H,
       });
+      element.dataset.qrcodeUrl = url;
+    };
+    if (window.QRCode) return render();
+    if (!anzhiyu.qrcodeCreate.loading) {
+      anzhiyu.qrcodeCreate.loading = getScript(GLOBAL_CONFIG.source.qrcode).catch(() => {
+        anzhiyu.qrcodeCreate.loading = null;
+      });
     }
+    return anzhiyu.qrcodeCreate.loading.then(render);
   },
 
   // 判断是否在el内

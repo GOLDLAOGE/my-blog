@@ -5,7 +5,7 @@ import { runInNewContext } from 'node:vm';
 import { expect, it } from 'vitest';
 import { parse } from 'yaml';
 
-it('versions only the three local assets used by the released page', () => {
+it('versions the changed local assets used by the released page', () => {
   const file = resolve('themes/anzhiyu/scripts/events/cdn.js');
   const themeConfig = parse(readFileSync('_config.anzhiyu.yml', 'utf8'));
   let beforeGenerate;
@@ -20,9 +20,11 @@ it('versions only the three local assets used by the released page', () => {
   runInNewContext(readFileSync(file, 'utf8'), { require: createRequire(file), hexo });
   beforeGenerate();
   expect(themeConfig.asset).toMatchObject({
-    main_css: 'css/index.css?v=audit-20260928',
-    main: 'js/main.js?v=audit-20260928',
-    utils: 'js/utils.js?v=audit-20260928',
+    main_css: 'css/index.css?v=perf-20260929',
+    main: 'js/main.js?v=perf-20260929',
+    utils: 'js/utils.js?v=perf-20260929',
+    right_click_menu_js: 'js/anzhiyu/right_click_menu.js?v=perf-20260929',
+    local_search: 'js/search/local-search.js?v=perf-20260929',
     translate: 'js/tw_cn.js',
   });
 });

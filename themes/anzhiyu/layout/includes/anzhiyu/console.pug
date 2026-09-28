@@ -12,13 +12,9 @@
     .console-card-group-right
       .console-card.tags
         .card-content
-          if theme.nav_music.enable && theme.nav_music.console_widescreen_music
-            .author-content-item-tips=_p('console.music')
-            span.author-content-item-title=_p('console.music_desc')
-          else 
-            .author-content-item-tips=_p('console.interests')
-            span.author-content-item-title=_p('console.interests_desc')
-            !=partial('includes/widget/card_console_tags', {}, {cache: true})
+          .author-content-item-tips=_p('console.interests')
+          span.author-content-item-title=_p('console.interests_desc')
+          !=partial('includes/widget/card_console_tags', {}, {cache: true})
       .console-card.history
         .item-headline
           i.anzhiyufont.anzhiyu-icon-box-archiv
@@ -36,10 +32,6 @@
       .console-btn-item.on#consoleCommentBarrage
         button.commentBarrage(type='button' onclick='anzhiyu.switchCommentBarrage()' title=_p('console.toggle_barrage') aria-label=_p('console.toggle_barrage'))
           i.anzhiyufont.anzhiyu-icon-message
-    if theme.nav_music.enable
-      .console-btn-item#consoleMusic
-        button.music-switch(type='button' onclick='anzhiyu.musicToggle()' title=_p('console.toggle_music') aria-label=_p('console.toggle_music'))
-          i.anzhiyufont.anzhiyu-icon-music
     if theme.shortcutKey.enable
       .console-btn-item#consoleKeyboard
         button.keyboard-switch(type='button' onclick='anzhiyu.keyboardToggle()' title=_p('console.toggle_keyboard') aria-label=_p('console.toggle_keyboard'))

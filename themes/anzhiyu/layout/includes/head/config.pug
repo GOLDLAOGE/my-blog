@@ -161,11 +161,6 @@
     peoplecanvas = JSON.stringify(theme.peoplecanvas)
   }
 
-  let music_page_default = 'undefined'
-  if (theme.music_page_default) {
-    music_page_default = JSON.stringify(theme.music_page_default)
-  }
-
 script.
   const GLOBAL_CONFIG = {
     linkPageTop: !{linkPageTop},
@@ -176,11 +171,9 @@ script.
     greetingBox: !{greetingBox},
     twikooEnvId: '!{theme.twikoo.envId}',
     commentBarrageConfig:!{commentBarrageConfig},
-    music_page_default: !{music_page_default},
     root: '!{config.root}',
     preloader: !{preloader},
     friends_vue_info: !{friends_vue_info},
-    navMusic: !{theme.nav_music.enable},
     mainTone: !{mainTone},
     authorStatus: !{authorStatus},
     algolia: !{algolia},
@@ -210,6 +203,12 @@ script.
     lightbox: '!{ theme.medium_zoom ? "mediumZoom" : (theme.fancybox ? "fancybox" : "null" )}',
     Snackbar: !{Snackbar},
     source: {
+      fancybox: {
+        js: '!{url_for(theme.asset.fancybox)}',
+        css: '!{url_for(theme.asset.fancybox_css)}'
+      },
+      qrcode: 'https://cdn.cbd.int/qrcodejs@1.0.0/qrcode.min.js',
+      waterfall: '!{url_for(theme.asset.waterfall)}',
       justifiedGallery: {
         js: '!{url_for(theme.asset.flickr_justified_gallery_js)}',
         css: '!{url_for(theme.asset.flickr_justified_gallery_css)}'

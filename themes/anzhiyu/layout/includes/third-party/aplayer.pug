@@ -1,17 +1,8 @@
 script(data-pjax).
   (function () {
-    window.__optionalAudioPageRequested = !{JSON.stringify(Boolean(page.aplayer || page.type === 'music'))};
+    window.__optionalAudioPageRequested = !{JSON.stringify(Boolean(page.aplayer))};
     if (!window.ensureOptionalAudio) {
-      const navWidth = window.matchMedia('(min-width: 1201px)');
       let audioPromise;
-      let audioLoaded = false;
-      const mountNavPlayer = function () {
-        const nav = document.getElementById('nav-music');
-        if (!nav || nav.querySelector('meting-js')) return;
-        const template = nav.querySelector('#nav-music-player');
-        if (template) nav.appendChild(template.content.cloneNode(true));
-        if (audioLoaded) window.dispatchEvent(new Event('optional-audio-ready'));
-      };
       const loadScript = function (src) {
         return new Promise((resolve, reject) => {
           const script = document.createElement('script');
@@ -22,10 +13,8 @@ script(data-pjax).
         });
       };
       window.ensureOptionalAudio = function () {
-        const navEligible = navWidth.matches && !!document.getElementById('nav-music');
-        if (navEligible) mountNavPlayer();
         const pageAudio = Array.from(document.querySelectorAll('meting-js, .aplayer')).some(node => !node.closest('#nav-music'));
-        if (!navEligible && !window.__optionalAudioPageRequested && !pageAudio) return Promise.resolve(false);
+        if (!window.__optionalAudioPageRequested && !pageAudio) return Promise.resolve(false);
         if (audioPromise) return audioPromise;
         const style = document.createElement('link');
         style.rel = 'stylesheet';
@@ -33,18 +22,13 @@ script(data-pjax).
         document.head.appendChild(style);
         audioPromise = loadScript(!{JSON.stringify(url_for(theme.asset.aplayer_js))})
           .then(() => loadScript(!{JSON.stringify(url_for(theme.asset.meting_js))}))
-          .then(() => {
-            audioLoaded = true;
-            window.dispatchEvent(new Event('optional-audio-ready'));
-            return true;
-          })
+          .then(() => true)
           .catch(() => {
             audioPromise = null;
             return false;
           });
         return audioPromise;
       };
-      navWidth.addEventListener('change', () => window.ensureOptionalAudio());
     }
     window.ensureOptionalAudio();
   })();

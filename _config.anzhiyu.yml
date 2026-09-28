@@ -7,7 +7,7 @@ menu:
 nav:
   enable: true
   travelling: true
-  clock: true
+  clock: false
   menu:
     - title: 网页
       item:
@@ -684,7 +684,7 @@ subtitle:
   # 如果关闭打字效果，subtitle 只会显示 sub 的第一行文字
   sub: []
 preloader:
-  enable: true
+  enable: false
   # source
   # 1. fullpage-loading
   # 2. pace (progress bar)
@@ -1045,7 +1045,7 @@ comment_barrage_config:
 # 左下角音乐配置项
 # https://github.com/metowolf/MetingJS
 nav_music:
-  enable: true
+  enable: false
   console_widescreen_music: false # 宽屏状态控制台显示音乐而不是标签 enable为true 控制台依然会显示
   id: 8152976493
   server: netease
@@ -1193,9 +1193,11 @@ CDN:
   custom_format: # https://npm.elemecdn.com/${name}@latest/${file}
 
   option:
-    main_css: css/index.css?v=audit-20260928
-    main: js/main.js?v=audit-20260928
-    utils: js/utils.js?v=audit-20260928
+    main_css: css/index.css?v=perf-20260929
+    main: js/main.js?v=perf-20260929
+    utils: js/utils.js?v=perf-20260929
+    right_click_menu_js: js/anzhiyu/right_click_menu.js?v=perf-20260929
+    local_search: js/search/local-search.js?v=perf-20260929
     # translate:
     # random_friends_post_js:
     # right_click_menu_js:

@@ -3,6 +3,13 @@ import { JSDOM } from 'jsdom';
 import { renderSettings } from '../source/admin/settings.js';
 import { readEditableSettings, EDITABLE_SCHEMA } from '../functions/_lib/settings.js';
 afterEach(()=>vi.unstubAllGlobals());
+it('omits the removed weather control from the settings form', () => {
+  const dom = new JSDOM('<div id="fields"></div>');
+  vi.stubGlobal('document',dom.window.document);
+  const container=document.getElementById('fields');
+  renderSettings(container,{schema:EDITABLE_SCHEMA,settings:readEditableSettings('title: Test','nav:\n  clock: true')},()=>{});
+  expect(Boolean(container.querySelector('[data-key="nav_clock"]'))).toBe(false);
+});
 it('collects hidden categories, typed enums and reordered identities without losing edits', () => {
   const dom = new JSDOM('<div id="fields"></div>');
   vi.stubGlobal('document',dom.window.document);vi.stubGlobal('Event',dom.window.Event);

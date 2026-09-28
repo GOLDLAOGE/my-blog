@@ -1,20 +1,24 @@
 import { expect, it } from 'vitest';
 import { createRequire } from 'node:module';
+import { readFileSync } from 'node:fs';
 import { JSDOM } from 'jsdom';
+import { parse } from 'yaml';
 
 const require = createRequire(import.meta.url);
 const pug = require('pug');
+const theme = parse(readFileSync('themes/anzhiyu/_config.yml', 'utf8'));
 
 function render(file, page = {}) {
-  return pug.renderFile(`themes/anzhiyu/layout/includes/${file}.pug`, {
-    page,
-    theme: { asset: { aplayer_css: '/aplayer.css', aplayer_js: '/aplayer.js', meting_js: '/meting.js' }, nav_music: { id: 'playlist', server: 'netease', volume: 0.7 } },
-    url_for: value => value,
+  return pug.renderFile('themes/anzhiyu/layout/includes/' + file + '.pug', {
+    page, config: { title: 'Fixture' },
+    theme: { ...theme, nav: { ...theme.nav, clock: true }, asset: { aplayer_css: '/aplayer.css', aplayer_js: '/aplayer.js', meting_js: '/meting.js' } },
+    url_for: value => value, _p: key => key,
+    partial: name => name === 'includes/anzhiyu/clock' ? render('anzhiyu/clock') : '',
   });
 }
 
 function browser(html, width) {
-  const dom = new JSDOM(`<!doctype html><html><head></head><body>${html}</body></html>`, { runScripts: 'outside-only', url: 'https://example.test/' });
+  const dom = new JSDOM('<!doctype html><html><head></head><body>' + html + '</body></html>', { runScripts: 'outside-only', url: 'https://example.test/' });
   const { window } = dom;
   let currentWidth = width;
   const listeners = new Set();
@@ -43,62 +47,53 @@ function browser(html, width) {
 
 const flush = () => new Promise(resolve => setTimeout(resolve, 10));
 
-it('avoids weather resources at 1400px and loads them once when eligible', async () => {
-  const app = browser(render('anzhiyu/clock'), 390);
+it.each([390, 1600])('renders no weather or weather resources at %ipx, including resize and navigation', async width => {
+  const app = browser(render('header/nav'), width);
   app.runScripts();
-  expect(app.window.document.querySelectorAll('script[src*="qweather"], link[href*="qweather"]').length).toBe(0);
+  app.resize(1800);
+  app.window.document.body.insertAdjacentHTML('beforeend', render('header/nav'));
+  app.runScripts();
+  await flush();
+  expect(app.window.document.querySelector('#he-plugin-simple')).toBeNull();
   expect(app.requests).toEqual([]);
-  app.resize(1400);
-  await flush();
-  expect(app.requests).toEqual([]);
-  app.resize(1401);
-  await flush();
-  expect(app.requests).toEqual([
-    'https://widget.qweather.net/simple/static/css/he-simple.css?v=1.4.0',
-    'https://widget.qweather.net/simple/static/js/he-simple.js?v=1.4.0',
-  ]);
-  app.resize(1600);
-  await flush();
-  expect(app.requests).toHaveLength(2);
-  const nextHeader = app.window.document.createElement('header');
-  nextHeader.innerHTML = render('anzhiyu/clock');
-  app.window.document.body.appendChild(nextHeader);
-  app.window.eval(nextHeader.querySelector('script').textContent);
-  expect(app.window.document.querySelectorAll('#he-plugin-simple')).toHaveLength(1);
-  expect(app.requests).toHaveLength(2);
 });
 
-it('avoids nav music resources and player creation at 1200px, then initializes once', async () => {
-  const app = browser(render('music') + render('third-party/aplayer'), 390);
+it('removes the site music controls and shortcut even with legacy music settings enabled', () => {
+  const app = browser(render('anzhiyu/console') + render('anzhiyu/rightmenu') + render('shortcutKey'), 1600);
+  expect(app.window.document.querySelector('#consoleMusic, .music-switch, [id^="menu-music-"]')).toBeNull();
+  expect(app.window.document.querySelector('#keyboard-tips').textContent).not.toContain('shortcut.play_music');
+});
+
+it('does not revive an old site player on desktop or when resized', async () => {
+  const oldPlayer = '<div id="nav-music"><template id="nav-music-player"><meting-js id="old-playlist"></meting-js></template></div>';
+  const app = browser(oldPlayer + render('third-party/aplayer'), 1600);
   app.runScripts();
-  expect(app.window.document.querySelectorAll('script[src="/aplayer.js"], script[src="/meting.js"], link[href="/aplayer.css"]').length).toBe(0);
+  app.resize(1800);
+  await flush();
   expect(app.window.document.querySelector('#nav-music meting-js')).toBeNull();
   expect(app.requests).toEqual([]);
-  app.resize(1200);
-  await flush();
-  expect(app.requests).toEqual([]);
-  app.resize(1201);
-  await flush();
-  expect(app.window.document.querySelector('#nav-music meting-js')).not.toBeNull();
-  expect(app.requests).toEqual(['https://example.test/aplayer.css', 'https://example.test/aplayer.js', 'https://example.test/meting.js']);
-  app.resize(1600);
-  await flush();
-  expect(app.requests).toHaveLength(3);
 });
 
 it('loads explicitly requested article audio on mobile and reuses it after navigation', async () => {
-  const app = browser(render('music') + render('third-party/aplayer', { aplayer: true }), 390);
+  const app = browser(render('third-party/aplayer', { aplayer: true }), 390);
   app.runScripts();
   await flush();
   expect(app.requests).toEqual(['https://example.test/aplayer.css', 'https://example.test/aplayer.js', 'https://example.test/meting.js']);
-  expect(app.window.document.querySelector('#nav-music meting-js')).toBeNull();
   app.runScripts();
   await flush();
   expect(app.requests).toHaveLength(3);
 });
 
+it('loads embedded article audio without requiring a page flag', async () => {
+  const app = browser('<article><meting-js id="article-track"></meting-js></article>' + render('third-party/aplayer'), 390);
+  app.runScripts();
+  await flush();
+  expect(app.requests).toEqual(['https://example.test/aplayer.css', 'https://example.test/aplayer.js', 'https://example.test/meting.js']);
+  expect(app.window.document.querySelector('article meting-js').id).toBe('article-track');
+});
+
 it('loads article audio after narrow PJAX navigation from a plain page', async () => {
-  const app = browser(render('music') + render('third-party/aplayer'), 390);
+  const app = browser(render('third-party/aplayer'), 390);
   app.runScripts();
   expect(app.requests).toEqual([]);
   const article = app.window.document.createElement('section');
@@ -107,22 +102,10 @@ it('loads article audio after narrow PJAX navigation from a plain page', async (
   app.window.eval(article.querySelector('script').textContent);
   await flush();
   expect(app.requests).toEqual(['https://example.test/aplayer.css', 'https://example.test/aplayer.js', 'https://example.test/meting.js']);
-  expect(app.window.document.querySelector('#nav-music meting-js')).toBeNull();
 });
 
-it('announces nav audio readiness only after the deferred scripts finish loading', async () => {
-  const app = browser(render('music') + render('third-party/aplayer', { aplayer: true }), 390);
-  const ready = [];
-  app.window.addEventListener('optional-audio-ready', () => ready.push('ready'));
-  app.runScripts();
-  app.resize(1201);
-  expect(ready).toEqual([]);
-  await flush();
-  expect(ready).toEqual(['ready']);
-});
-
-it('does not load nav audio on desktop when the nav player is disabled', async () => {
-  const app = browser(render('third-party/aplayer'), 1600);
+it.each([{}, { type: 'music' }])('does not load audio for a page without article audio: %j', async page => {
+  const app = browser(render('third-party/aplayer', page), 1600);
   app.runScripts();
   await flush();
   expect(app.requests).toEqual([]);

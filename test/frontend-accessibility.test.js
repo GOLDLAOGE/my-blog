@@ -15,10 +15,10 @@ function page() {
     <div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus">
       <a id="first-link" href="/about/">About</a><a href="/posts/">Posts</a>
     </div></div>
-    <div id="console"><button id="consoleHideAside">Aside</button><button id="consoleMusic">Music</button>
+    <div id="console"><button id="consoleHideAside">Aside</button>
       <button class="console-mask">Close</button></div>
   </body></html>`, { url: 'https://xiax.cafe/', runScripts: 'dangerously', pretendToBeVisual: true });
-  dom.window.eval(`var anzhiyu_musicFirst = false, anzhiyu_musicPlaying = false, navMusicEl = null, rm = null;\n${utils}\nwindow.anzhiyu = anzhiyu;`);
+  dom.window.eval(`var rm = null;\n${utils}\nwindow.anzhiyu = anzhiyu;`);
   return dom;
 }
 
@@ -141,7 +141,7 @@ it('skips controls inside a hidden console card when moving focus on open', () =
   expect(document.activeElement.id).toBe('consoleHideAside');
 });
 
-it('dismisses the shared mask when a music playlist uses it with the sidebar closed', () => {
+it('dismisses a visible shared mask with the sidebar closed', () => {
   const { window } = page();
   const { document } = window;
   window.matchMedia = () => ({ matches: true });
@@ -208,61 +208,36 @@ it('renders native, named buttons for the console and mobile menu actions', () =
   expect(nav.querySelector('#center-console').tagName).toBe('BUTTON');
   expect(nav.querySelector('#center-console').getAttribute('aria-controls')).toBe('console');
   expect(nav.querySelector('#toggle-menu button[aria-controls="sidebar-menus"]')).not.toBeNull();
-  for (const selector of ['.darkmode_switchbutton', '.asideSwitch', '.commentBarrage', '.music-switch', '.keyboard-switch', '.console-mask']) {
+  for (const selector of ['.darkmode_switchbutton', '.asideSwitch', '.commentBarrage', '.keyboard-switch', '.console-mask']) {
     const control = consolePanel.querySelector(selector);
     expect(control?.tagName).toBe('BUTTON');
     expect(control?.getAttribute('aria-label') || control?.getAttribute('title')).toBeTruthy();
   }
   expect(sidebar.querySelector('.darkmode_switchbutton').tagName).toBe('BUTTON');
+  expect(Boolean(consolePanel.querySelector('.music-switch'))).toBe(false);
 });
 
-it('ignores music controls safely when optional nav audio is ineligible', async () => {
+it('can dismiss loading when the full-page preloader is disabled', () => {
   const { window } = page();
-  window.ensureOptionalAudio = async () => false;
-  await expect(window.anzhiyu.musicToggle()).resolves.toBe(false);
-  await expect(window.anzhiyu.musicSkipBack()).resolves.toBe(false);
-  await expect(window.anzhiyu.musicSkipForward()).resolves.toBe(false);
-  expect(window.document.querySelector('#nav-music meting-js')).toBeNull();
+  expect(() => window.anzhiyu.hideLoading()).not.toThrow();
 });
 
-it('updates nav controls once when a deferred player emits play and pause', () => {
+it('keeps the right-click menu working without any site music controls', () => {
   const { window } = page();
-  const { document } = window;
-  const nav = document.createElement('div');
-  nav.id = 'nav-music';
-  nav.innerHTML = '<meting-js></meting-js><span id="nav-music-hoverTips"></span>';
-  document.body.append(nav);
-  document.body.insertAdjacentHTML('beforeend', '<div id="menu-music-toggle"></div>');
-  const events = {};
-  nav.querySelector('meting-js').aplayer = { on(name, handler) { events[name] = handler; } };
-  window.anzhiyu.initNavMusicPauseListener();
-  window.anzhiyu.initNavMusicPauseListener();
-  events.play();
-  expect(nav.classList.contains('playing')).toBe(true);
-  expect(document.getElementById('menu-music-toggle').textContent).toBe('暂停音乐');
-  events.pause();
-  expect(nav.classList.contains('playing')).toBe(false);
-  expect(document.getElementById('menu-music-toggle').textContent).toBe('播放音乐');
-});
-
-it('can initialize music-page background before the optional nav player exists', async () => {
-  const { window } = page();
-  const errors = [];
-  window.addEventListener('error', event => { errors.push(event.message); event.preventDefault(); });
-  window.document.body.insertAdjacentHTML('beforeend', '<div id="an_music_bg"></div><div id="anMusic-page"><div class="aplayer-pic" style="background-image:url(cover.jpg)"></div></div>');
-  window.anzhiyu.addEventListenerMusic = () => {};
-  window.anzhiyu.changeMusicBg(false);
-  await new Promise(resolve => setTimeout(resolve, 130));
-  expect(window.document.getElementById('an_music_bg').style.backgroundImage).toContain('cover.jpg');
-  expect(errors).toEqual([]);
-});
-
-it('allows nav clicks before the deferred music list is mounted', () => {
-  const { window } = page();
-  const errors = [];
-  window.addEventListener('error', event => { errors.push(event.message); event.preventDefault(); });
-  window.document.body.insertAdjacentHTML('beforeend', '<div id="nav-music"><template><meting-js></meting-js></template></div>');
-  window.anzhiyu.addEventListenerConsoleMusicList();
-  window.document.getElementById('nav-music').click();
-  expect(errors).toEqual([]);
+  const html = pug.renderFile('themes/anzhiyu/layout/includes/anzhiyu/rightmenu.pug', {
+    theme: { translate: {}, nav_music: {} },
+  });
+  window.document.body.insertAdjacentHTML('beforeend', html);
+  window.document.querySelectorAll('[id^="menu-music-"]').forEach(node => node.remove());
+  expect(() => window.eval(readFileSync('themes/anzhiyu/source/js/anzhiyu/right_click_menu.js', 'utf8'))).not.toThrow();
+  Object.defineProperty(window.document.body, 'clientWidth', { value: 1600 });
+  window.selectTextNow = '';
+  window.stopMaskScroll = () => {};
+  const rightMenu = window.document.getElementById('rightMenu');
+  expect(() => window.oncontextmenu({ target: window.document.querySelector('main'), clientX: 20, clientY: 30 })).not.toThrow();
+  expect(rightMenu.style.display).toBe('block');
+  expect(window.document.getElementById('menu-copyimg').style.display).toBe('none');
+  window.document.querySelector('main').insertAdjacentHTML('beforeend', '<img src="/article.webp" alt="Article image">');
+  expect(() => window.oncontextmenu({ target: window.document.querySelector('main img'), clientX: 20, clientY: 30 })).not.toThrow();
+  expect(window.document.getElementById('menu-copyimg').style.display).toBe('block');
 });

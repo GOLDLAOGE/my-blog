@@ -8,6 +8,13 @@ const root = '# keep comment\ntitle: Old\nurl: https://blog.test\npermalink: :ye
 const theme = 'avatar:\n  img: /old.webp\n  effect: true\nunknown:\n  value: preserve\nmenu:\n  博客:\n    首页: / || anzhiyu-icon-house\n';
 
 describe('settings transforms', () => {
+  it('does not expose or accept the removed weather switch', () => {
+    const settings = readEditableSettings(root, 'nav:\n  clock: true\n');
+    expect(settings.theme).not.toHaveProperty('nav_clock');
+    expect(THEME_FIELDS).not.toHaveProperty('nav_clock');
+    settings.theme.nav_clock = true;
+    expect(() => writeEditableSettings(root, theme, settings)).toThrow('包含未开放的设置字段');
+  });
   it('matches all non-null scalar defaults from the installed theme', () => {
     const installed = parse(readFileSync(new URL('../themes/anzhiyu/_config.yml',import.meta.url),'utf8'));
     const fallback = readEditableSettings(root, '{}').theme;

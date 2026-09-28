@@ -15,7 +15,7 @@ if home_top_config.enable
             if site.data.creativity
               include ../anzhiyu/tags-group-all.pug
             else
-              img.home-brand-icon(src=url_for(theme.preloader.avatar || theme.avatar.img) alt='' width='180' height='180')
+              img.home-brand-icon.nolazyload(src=url_for(theme.preloader.avatar || theme.avatar.img) loading='eager' alt='' width='180' height='180')
 
           a#random-hover(href='javascript:toRandomPost()')
             i.anzhiyufont.anzhiyu-icon-paper-plane
@@ -92,7 +92,7 @@ if home_top_config.enable
                 if top_group_banner_tips
                   .todayCard-tips=top_group_banner_tips
                 .todayCard-title=top_group_banner_title
-              img.todayCard-cover(src=url_for(top_group_banner_image) onerror=`this.onerror=null;this.src='${url_for(theme.error_img.post_page)}'` alt='')
+              img.todayCard-cover.nolazyload(src=url_for(top_group_banner_image) srcset=cover_srcset(top_group_banner_image) sizes='(max-width: 1200px) calc(100vw - 32px), 800px' loading='eager' fetchpriority='high' onerror=`this.onerror=null;this.removeAttribute('srcset');this.src='${url_for(theme.error_img.post_page)}'` alt='')
             .banner-button-group
               button.banner-button(type='button' onclick='anzhiyu.hideTodayCard();')
                 i.anzhiyufont.anzhiyu-icon-arrow-circle-right
