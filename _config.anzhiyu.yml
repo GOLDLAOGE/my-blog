@@ -1,7 +1,7 @@
 menu:
-  文章: /archives/
-  分类: /categories/
-  关于: /about/
+  文章: "/archives/ || "
+  分类: "/categories/ || "
+  关于: "/about/ || "
 
 # nav相关配置
 nav:
@@ -124,7 +124,7 @@ favicon: /img/brand/favicon.svg
 # Avatar (头像)
 avatar:
   img: /img/brand/logo-dark.svg
-  effect: false
+  effect: true
 
 # Disable all banner image
 disable_top_img: false
@@ -523,7 +523,7 @@ site_verification:
 theme_color:
   enable: true
   main: "#008653"
-  dark_main: "#57C796"
+  dark_main: "#57c796"
   paginator: "#008653"
   button_hover: "#006B43"
   text_selection: "#006B43"
