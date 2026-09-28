@@ -1193,9 +1193,9 @@ CDN:
   custom_format: # https://npm.elemecdn.com/${name}@latest/${file}
 
   option:
-    # main_css:
-    # main:
-    # utils:
+    main_css: css/index.css?v=audit-20260928
+    main: js/main.js?v=audit-20260928
+    utils: js/utils.js?v=audit-20260928
     # translate:
     # random_friends_post_js:
     # right_click_menu_js:
