@@ -1,6 +1,6 @@
 # 个人博客 CMS 配置与验收
 
-后台地址：`https://my-blog-4w1.pages.dev/admin/`。仅 GitHub 用户 `GOLDLAOGE` 可登录。部署代码前，先完成下面的绑定及密钥配置。
+后台地址：`https://xiax.cafe/admin/`。仅 GitHub 用户 `GOLDLAOGE` 可登录。部署代码前，先完成下面的绑定及密钥配置。
 
 ## 1. 创建 Cloudflare 存储
 
@@ -25,8 +25,10 @@
 GitHub → Settings → Developer settings → OAuth Apps → New OAuth App：
 
 - 名称：`My Blog CMS`
-- Homepage URL：`https://my-blog-4w1.pages.dev`
-- Authorization callback URL：`https://my-blog-4w1.pages.dev/api/auth/callback`
+- Homepage URL：`https://xiax.cafe`
+- Authorization callback URL：`https://xiax.cafe/api/auth/callback`
+
+生产应用保留 `https://my-blog-4w1.pages.dev/api/auth/callback` 作为原 Pages 地址的回调；不启用通配符。新域名需要重新登录，原域名会话不会跨域共享。
 
 生成 Client Secret 后，直接填入 Cloudflare 的 Secret 字段，不要发到聊天、截图或提交 Git。OAuth 只读取账号身份，仓库写入使用下一节的独立令牌。
 
@@ -89,7 +91,7 @@ Hexo 本地 `npm run server` 只预览静态后台，不提供 OAuth、R2 和 Gi
 
 ## 7. 正式上线
 
-预览全部通过后，经确认合并到 main 并推送，等待 Production 构建成功。用正式域名登录并重复发布、图片和设置的关键验收。首次在后台将网站 URL 改成正式网址（当前 Hexo 配置可能仍是 example.com），以便生成正确 canonical 链接。
+预览全部通过后，经确认合并到 main 并推送，等待 Production 构建成功。用正式域名登录并重复发布、图片和设置的关键验收。Hexo 的网站 URL 使用 `https://xiax.cafe`，以便生成正确的 canonical 和分享链接；更换域名时须同步更新此配置与 OAuth 回调。
 
 ## 免费额度与限制
 
