@@ -404,7 +404,7 @@ crisp:
     # --------------------------------------
 footer:
   owner:
-    enable: true
+    enable: false
     since: 2026
   custom_text: ""
   runtime:
@@ -417,18 +417,18 @@ footer:
   # 徽标部分配置项 https://shields.io/
   # https://img.shields.io/badge/CDN-jsDelivr-orange?style=flat&logo=jsDelivr
   bdageitem:
-    enable: false
+    enable: true
     list:
       - link: https://xiax.cafe/
         shields: /media/posts/2026/09/36dab7fcadb04f51a448f90254f976af.webp
         message: ""
   socialBar:
-    enable: false
-    centerImg: false
+    enable: true
+    centerImg: /media/posts/2026/09/361ea2a76f9242bd90e7cc3f2ea382f9.webp
     left: []
     right: []
   list:
-    enable: false
+    enable: true
     randomFriends: 3
     project: []
   footerBar:
