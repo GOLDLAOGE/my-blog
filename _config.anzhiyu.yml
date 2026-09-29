@@ -1,7 +1,10 @@
 menu:
-  文章: "/archives/ || "
-  分类: "/categories/ || "
-  关于: "/about/ || "
+  网页:
+    首页: "/ || "
+  发现:
+    出海指南: "/categories/ || "
+    实战笔记: "/archives/ || "
+    关于小虾: "/about/ || "
 
 # nav相关配置
 nav:
@@ -11,15 +14,15 @@ nav:
   menu:
     - title: 网页
       item:
-        - name: 博客
+        - name: 首页
           link: /
           icon: /img/brand/favicon.svg
     - title: 发现
       item:
-        - name: 分类
-          link: /categories/
+        - name: 文章归档
+          link: /archives/
           icon: /img/brand/icon.svg
-        - name: 关于
+        - name: 关于小虾
           link: /about/
           icon: /img/brand/logo.svg
 
