@@ -711,7 +711,7 @@ aside:
     category: true
   card_author:
     enable: true
-    description: "一杯咖啡的时间，记录开发中的小发现、学习中的新想法，以及值得留住的日常。"
+    description: "我在东莞经营一家小型实体加工企业，也亲手实践独立站、Google SEO、海外社媒和 AI。这里记录真实的过程、数据、失误与修正。"
     name_link: /about/
 
   card_announcement:
@@ -958,8 +958,8 @@ css_prefix: true
 home_top:
   enable: true # 开关
   timemode: date #date/updated
-  title: 生活明朗
-  subTitle: 万物可爱。
+  title: 杨小虾
+  subTitle: 一个东莞小企业主的出海获客实验
   siteText: XIAX.CAFE
   category:
     - name: 前端
