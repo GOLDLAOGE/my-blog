@@ -16,6 +16,20 @@ it.each(['building-a-small-blog', 'organizing-study-notes', 'coffee-and-reading'
   });
 });
 
+it.each([
+  ['start-first-week-checklist', 'start-first-week'],
+  ['seo-search-intent-keyword-sheet', 'seo-keyword-research'],
+  ['acquisition-inquiry-workflow', 'acquisition-inquiry'],
+  ['ai-inquiry-human-review', 'ai-human-review'],
+])('uses a distinct optimized cover for the %s sample post', (slug, coverName) => {
+  const post = parsePost(readFileSync(new URL(`../source/_posts/${slug}.md`, import.meta.url), 'utf8'));
+  expect(post.cover).toBe(`/img/covers/${coverName}.webp`);
+  for (const suffix of ['', '-480', '-768', '-1120']) {
+    const image = new URL(`../source/img/covers/${coverName}${suffix}.webp`, import.meta.url);
+    expect(statSync(image).size).toBeLessThan(150_000);
+  }
+});
+
 it('keeps the about page editable as ordinary Markdown', () => {
   const markdown = readFileSync(new URL('../source/about/index.md', import.meta.url), 'utf8');
   const page = parsePage(markdown);

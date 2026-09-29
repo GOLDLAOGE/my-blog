@@ -7,7 +7,7 @@ tags:
   - AI 提效
   - 询盘整理
 excerpt: 示例内容：让 AI 帮忙整理询盘信息与回复提纲，但价格、交期和承诺必须由人确认。
-cover: ""
+cover: /img/covers/ai-human-review.webp
 seo_title: AI 整理询盘与人工复核（示例）
 description: AI 提效栏目示例文章：演示如何整理询盘、制作回复提纲并设置人工复核点，不宣称实际节省时间或提高成交。
 keywords:

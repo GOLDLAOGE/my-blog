@@ -7,7 +7,7 @@ tags:
   - 海外获客
   - 询盘跟进
 excerpt: 示例内容：将海外获客拆成渠道、落地页、询盘和回复四步，先检查流程是否闭环，再谈扩大投入。
-cover: ""
+cover: /img/covers/acquisition-inquiry.webp
 seo_title: 海外获客与询盘跟进流程（示例）
 description: 海外获客栏目示例文章：按渠道、落地页、询盘记录和回复节奏梳理最小流程，不包含真实转化数据。
 keywords:

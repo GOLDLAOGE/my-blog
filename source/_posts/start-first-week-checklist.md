@@ -7,7 +7,7 @@ tags:
   - 出海准备
   - 清单
 excerpt: 示例内容：用一页清单核对目标客户、产品资料、网站基础信息与询盘承接方式。正式使用前请替换为真实业务记录。
-cover: ""
+cover: /img/covers/start-first-week.webp
 seo_title: 出海起步第一周准备清单（示例）
 description: 出海起步栏目示例文章，列出目标客户、产品资料、网站信息和询盘流程的基础检查项；不代表真实项目结果。
 keywords:

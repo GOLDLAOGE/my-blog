@@ -7,7 +7,7 @@ tags:
   - Google SEO
   - 关键词研究
 excerpt: 示例内容：用客户问题整理第一张关键词表，区分信息查询与采购意图，再决定页面应该回答什么。
-cover: ""
+cover: /img/covers/seo-keyword-research.webp
 seo_title: Google SEO 搜索意图与关键词表（示例）
 description: Google SEO 栏目示例文章：从客户问题建立关键词表、区分搜索意图并规划页面。不包含真实排名或流量数据。
 keywords:

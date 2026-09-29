@@ -63,6 +63,11 @@ it('serves real smaller cover variants without changing arbitrary CMS or remote 
   }
 });
 
+it.each(['start-first-week', 'seo-keyword-research', 'acquisition-inquiry', 'ai-human-review'])('serves responsive variants for the %s editorial cover', name => {
+  const srcset = helpers.cover_srcset(`/img/covers/${name}.webp`);
+  expect(srcset).toBe(`/img/covers/${name}-480.webp 480w, /img/covers/${name}-768.webp 768w, /img/covers/${name}-1120.webp 1120w, /img/covers/${name}.webp 1440w`);
+});
+
 it('keeps the first-screen responsive covers within a mobile transfer budget', () => {
   for (const [name, max768, max1120] of [
     ['coffee-reading', 30_000, 48_000],
