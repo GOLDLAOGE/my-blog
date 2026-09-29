@@ -959,7 +959,7 @@ home_top:
   enable: true # 开关
   timemode: date #date/updated
   title: 杨小虾
-  subTitle: 一个东莞小企业主的出海获客实验
+  subTitle: 出海获客实践笔记
   siteText: XIAX.CAFE
   category:
     - name: 独立站
