@@ -961,17 +961,17 @@ home_top:
       path: /categories/独立站/
       shadow: var(--anzhiyu-shadow-blue)
       class: blue
-      icon: anzhiyu-icon-dove
+      icon: xiax-icon-dove
+    - name: 海外获客
+      path: /categories/海外获客/
+      icon: xiax-icon-link
+      class: green
+      shadow: var(--anzhiyu-shadow-green)
     - name: 小虾实验室
       path: /categories/小虾实验室/
       shadow: var(--anzhiyu-shadow-red)
       class: red
-      icon: anzhiyu-icon-fire
-    - name: 海外获客
-      path: /categories/海外获客/
-      icon: anzhiyu-icon-link
-      class: green
-      shadow: var(--anzhiyu-shadow-green)
+      icon: xiax-icon-fire
   default_descr: 再怎么看我也不知道怎么描述它的啦！
   swiper:
     enable: false
