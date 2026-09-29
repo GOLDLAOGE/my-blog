@@ -972,6 +972,11 @@ home_top:
       shadow: var(--anzhiyu-shadow-red)
       class: red
       icon: anzhiyu-icon-fire
+    - name: 海外获客
+      path: /categories/海外获客/
+      icon: anzhiyu-icon-link
+      class: green
+      shadow: var(--anzhiyu-shadow-green)
   default_descr: 再怎么看我也不知道怎么描述它的啦！
   swiper:
     enable: false
