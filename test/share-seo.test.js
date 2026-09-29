@@ -3,6 +3,7 @@ import { createRequire } from 'node:module';
 import { existsSync, readFileSync } from 'node:fs';
 import { runInNewContext } from 'node:vm';
 import { parse } from 'yaml';
+import { JSDOM } from 'jsdom';
 
 const require = createRequire(import.meta.url);
 const pug = require('pug');
@@ -31,6 +32,30 @@ function articleLocals(page, cached = new Map()) {
   };
   return locals;
 }
+
+it('names share links inserted after the article loads and after PJAX navigation', async () => {
+  const html = pug.renderFile(`${templateRoot}includes/third-party/share/share-js.pug`, articleLocals({ cover: '/img/covers/coffee-reading.webp' }));
+  const dom = new JSDOM(`<body>${html}</body>`, { runScripts: 'outside-only' });
+  const { document } = dom.window;
+  const script = document.querySelector('script[data-pjax]');
+  expect(script).not.toBeNull();
+  dom.window.eval(script.textContent);
+  const share = document.querySelector('.social-share');
+  share.innerHTML = '<a class="social-share-icon icon-facebook" href="#"></a><a class="social-share-icon icon-wechat" href="#"></a>';
+  await new Promise(resolve => dom.window.setTimeout(resolve, 0));
+  expect(share.querySelector('.icon-facebook').getAttribute('aria-label')).toBe('分享到 Facebook');
+  expect(share.querySelector('.icon-wechat').getAttribute('aria-label')).toBe('分享到微信');
+
+  share.replaceWith(document.createElement('div'));
+  const newShare = document.createElement('div');
+  newShare.className = 'social-share';
+  document.body.append(newShare);
+  dom.window.eval(script.textContent);
+  newShare.innerHTML = '<a class="social-share-icon icon-qq" href="#"></a>';
+  await new Promise(resolve => dom.window.setTimeout(resolve, 0));
+  expect(newShare.querySelector('.icon-qq').getAttribute('aria-label')).toBe('分享到 QQ');
+  dom.window.close();
+});
 
 it('renders each article share image as its own absolute URL after another article was rendered', () => {
   const cached = new Map();

@@ -2,3 +2,25 @@
 .social-share(data-image=full_url_for(page.cover || shareImage) data-sites= theme.sharejs.sites)
 link(rel='stylesheet' href=url_for(theme.asset.sharejs_css) media="print" onload="this.media='all'")
 script(src=url_for(theme.asset.sharejs) defer)
+script(data-pjax).
+  (() => {
+    if (window.__shareA11yObserver) window.__shareA11yObserver.disconnect();
+    const share = document.querySelector('.social-share');
+    if (!share) return;
+    const labels = {
+      facebook: '分享到 Facebook',
+      twitter: '分享到 X',
+      wechat: '分享到微信',
+      weibo: '分享到微博',
+      qq: '分享到 QQ'
+    };
+    const labelLinks = () => {
+      share.querySelectorAll('a.social-share-icon').forEach(link => {
+        const site = Object.keys(labels).find(name => link.classList.contains(`icon-${name}`));
+        if (site) link.setAttribute('aria-label', labels[site]);
+      });
+    };
+    labelLinks();
+    window.__shareA11yObserver = new MutationObserver(labelLinks);
+    window.__shareA11yObserver.observe(share, { childList: true });
+  })();

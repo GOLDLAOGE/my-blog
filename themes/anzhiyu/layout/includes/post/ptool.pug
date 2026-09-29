@@ -35,7 +35,7 @@ if !theme.disable_top_img && page.top_img !== false
                 .reward-dec 使用手机访问这篇文章
       if theme.ptool.share_weibo
         .share-link.weibo
-          a.share-button(target='_blank' href=`https://service.weibo.com/share/share.php?title=${encodeURIComponent(site_title)}&url=${encodeURIComponent(url)}&pic=${encodeURIComponent(bg_img)}` rel='external nofollow noreferrer noopener')
+          a.share-button(target='_blank' aria-label='分享到微博' href=`https://service.weibo.com/share/share.php?title=${encodeURIComponent(site_title)}&url=${encodeURIComponent(url)}&pic=${encodeURIComponent(bg_img)}` rel='external nofollow noreferrer noopener')
             i.anzhiyufont.anzhiyu-icon-weibo
       if theme.ptool.share_copyurl
         script.

@@ -95,6 +95,21 @@ it('compiled sidebar stays offscreen and inert when closed without hiding focus 
   expect(inertRule).not.toMatch(/visibility:\s*hidden;/);
 });
 
+it('keeps inactive article table-of-contents links readable before hover', () => {
+  const css = stylus.render('.limit-one-line\n  overflow hidden\n' + readFileSync('themes/anzhiyu/source/css/_layout/sidebar.styl', 'utf8'));
+  const rule = css.match(/#aside-content #card-toc \.toc-content \.toc-link:not\(\.active\) span\s*\{([^}]*)\}/)?.[1];
+  expect(rule).toBeDefined();
+  expect(rule).not.toMatch(/opacity:\s*(?:0|0\.\d+)/);
+  expect(rule).not.toMatch(/filter:\s*blur\(/);
+});
+
+it('keeps archive and category dates legible without fading their text', () => {
+  const css = stylus.render('.limit-one-line\n  overflow hidden\n' + readFileSync('themes/anzhiyu/source/css/_layout/sidebar.styl', 'utf8'));
+  const rule = css.match(/\.card-archive-list-date,\s*span\.card-category-list-name\s*\{([^}]*)\}/)?.[1];
+  expect(rule).toBeDefined();
+  expect(rule).not.toMatch(/opacity:\s*(?:0|0\.\d+)/);
+});
+
 it('compiled header styles keep the mobile menu target at 44px and the console trigger hidden', () => {
   const source = '.limit-one-line\n  overflow hidden\n.limit-more-line\n  overflow hidden\n'
     + readFileSync('themes/anzhiyu/source/css/_layout/head.styl', 'utf8')

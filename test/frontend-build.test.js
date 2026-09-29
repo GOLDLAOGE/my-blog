@@ -31,6 +31,7 @@ it('builds actual pages, articles, CSS and assets from the editable payload with
     expect(home).toContain('Fixture home');expect(home).toContain('Fixture announcement');expect(home).toContain('Fixture author');expect(home).toContain('/media/fixture-weixin.webp');expect(home).toContain('href="/categories/fixture/"');
     expect(home).toContain('data-theme="dark"');expect(home).toContain('id="runtimeshow"');
     const homeDoc=new JSDOM(home).window.document;
+    expect(homeDoc.querySelector('meta[name="viewport"]')?.content).not.toMatch(/user-scalable\s*=\s*no|maximum-scale\s*=\s*1/i);
     const recommendation=homeDoc.querySelector('#todayCard');
     expect(recommendation.querySelector(':scope > a.todayCard-link[href]')).not.toBeNull();
     const moreRecommendations=recommendation.querySelector('button[type="button"]');
@@ -40,6 +41,8 @@ it('builds actual pages, articles, CSS and assets from the editable payload with
     expect(!!new JSDOM(about,{url:'https://fixture.test/about/'}).window.document.querySelector('#aside-content')).toBe(false);
     expect(links).toContain('href="https://friend.example"');expect(links).toContain('/media/fixture-friend.webp');
     const doc=new JSDOM(post,{url:'https://fixture.test/post/'}).window.document;
+    expect(doc.querySelector('#post-top-bg')?.getAttribute('alt')).toBe('');
+    expect(doc.querySelector('.post-tools-left .weibo a')?.getAttribute('aria-label')).toBe('分享到微博');
     expect(!!doc.querySelector('#card-toc')).toBe(true);expect(post).toContain('Fixture license');expect(post).toContain('href="https://author.example"');
     expect(!!doc.querySelector('#post-firstinfo .article-meta.tags')).toBe(false);
     expect(!!doc.querySelector('#article-container > header a[href^="/tags/"]')).toBe(false);
