@@ -13,7 +13,7 @@ it('builds actual pages, articles, CSS and assets from the editable payload with
   try{
     mkdirSync(join(fixture,'themes'));symlinkSync(resolve('themes/anzhiyu'),join(fixture,'themes/anzhiyu'),'dir');
     symlinkSync(resolve('node_modules'),join(fixture,'node_modules'),'dir');writeFileSync(join(fixture,'package.json'),readFileSync('package.json'));
-    mkdirSync(join(fixture,'source/_posts'),{recursive:true});mkdirSync(join(fixture,'source/about'));mkdirSync(join(fixture,'source/link'));mkdirSync(join(fixture,'source/_data'));
+    mkdirSync(join(fixture,'source/_posts'),{recursive:true});mkdirSync(join(fixture,'source/about'));mkdirSync(join(fixture,'source/link'));mkdirSync(join(fixture,'source/room'));mkdirSync(join(fixture,'source/_data'));
     const root=readFileSync('_config.yml','utf8'),theme=readFileSync('themes/anzhiyu/_config.yml','utf8'),settings=readEditableSettings(root,theme);
     settings.site.title='Hexo';
     Object.assign(settings.theme,{home_top_title:'Fixture home',peoplecanvas_enable:false,theme_color_main:'#123456',theme_color_dark_main:'#654321',display_mode:'dark',
@@ -22,12 +22,12 @@ it('builds actual pages, articles, CSS and assets from the editable payload with
     settings.lists.home_top_category=[{name:'Fixture category',path:'/categories/fixture/',class:'blue',icon:'anzhiyu-icon-link'}];
     const output=writeEditableSettings(root,theme,settings);writeFileSync(join(fixture,'_config.yml'),output.rootYaml);writeFileSync(join(fixture,'_config.anzhiyu.yml'),output.themeYaml);
     const page={title:'Fixture About',body:'# About heading\n\nFixture Markdown',description:'Fixture SEO',keywords:['Fixture keyword'],seoTitle:'Fixture Search Title',top_img:false,aside:false,comments:false,type:''};
-    writeFileSync(join(fixture,'source/about/index.md'),serializePage(page,null));writeFileSync(join(fixture,'source/link/index.md'),serializePage({...page,title:'Fixture Links',type:'link'},null));
+    writeFileSync(join(fixture,'source/about/index.md'),serializePage(page,null));writeFileSync(join(fixture,'source/link/index.md'),serializePage({...page,title:'Fixture Links',type:'link'},null));writeFileSync(join(fixture,'source/room/index.md'),'---\ntitle: Fixture Room\ntype: room\ncomments: false\n---\n');
     writeFileSync(join(fixture,'source/_data/link.yml'),writeFriendLinks('',[{class_name:'Fixture friends',class_desc:'Group description',links:[{name:'Fixture site',descr:'A friend',link:'https://friend.example',avatar:'/media/fixture-friend.webp'}]}]));
     for(const name of ['fixture','related'])writeFileSync(join(fixture,`source/_posts/${name}.md`),`---\ntitle: ${name}\ndate: 2026-01-01 12:00:00\ntags: [Fixture tag]\ncategories: [Fixture category]\n---\n## Fixture heading\n\nFixture body`);
     hexo=new Hexo(fixture,{silent:true});await hexo.init();await hexo.call('generate');
     const html=path=>readFileSync(join(fixture,'public',path),'utf8');
-    const home=html('index.html'),about=html('about/index.html'),links=html('link/index.html'),post=html('2026/01/01/fixture/index.html');
+    const home=html('index.html'),about=html('about/index.html'),links=html('link/index.html'),room=html('room/index.html'),post=html('2026/01/01/fixture/index.html');
     expect(home).toContain('Fixture home');expect(home).toContain('Fixture announcement');expect(home).toContain('Fixture author');expect(home).toContain('/media/fixture-weixin.webp');expect(home).toContain('href="/categories/fixture/"');
     expect(home).toContain('data-theme="dark"');expect(home).toContain('id="runtimeshow"');
     const homeDoc=new JSDOM(home).window.document;
@@ -40,6 +40,7 @@ it('builds actual pages, articles, CSS and assets from the editable payload with
     expect(about).toContain('<title>Fixture Search Title | Hexo</title>');expect(about).toContain('name="description" content="Fixture SEO"');expect(about).toContain('Fixture Markdown');expect(about).toContain('name="keywords" content="Fixture keyword"');
     expect(!!new JSDOM(about,{url:'https://fixture.test/about/'}).window.document.querySelector('#aside-content')).toBe(false);
     expect(links).toContain('href="https://friend.example"');expect(links).toContain('/media/fixture-friend.webp');
+    expect(new JSDOM(room).window.document.querySelector('link[href="/css/room.css"]')).not.toBeNull();
     const doc=new JSDOM(post,{url:'https://fixture.test/post/'}).window.document;
     expect(doc.querySelector('#post-top-bg')?.getAttribute('alt')).toBe('');
     expect(doc.querySelector('.post-tools-left .weibo a')?.getAttribute('aria-label')).toBe('分享到微博');
@@ -47,6 +48,7 @@ it('builds actual pages, articles, CSS and assets from the editable payload with
     expect(!!doc.querySelector('#post-firstinfo .article-meta.tags')).toBe(false);
     expect(!!doc.querySelector('#article-container > header a[href^="/tags/"]')).toBe(false);
     const css=html('css/index.css');expect(/--anzhiyu-theme:\s*#123456/i.test(css)).toBe(true);expect(/--anzhiyu-theme:\s*#654321/i.test(css)).toBe(true);
+    expect(css).not.toContain('#room_page');expect(html('css/room.css')).toContain('#room_page');
     const categoryButton = css.match(/a\.categoryButton\s*\{([^}]+)\}/)?.[1];
     expect(categoryButton).toMatch(/font-size:\s*1\.2rem/);
     expect(css).not.toMatch(/a\.categoryButton:after\s*\{/);

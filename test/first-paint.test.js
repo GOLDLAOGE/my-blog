@@ -1,4 +1,4 @@
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, statSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { resolve } from 'node:path';
 import { runInNewContext } from 'node:vm';
@@ -52,14 +52,24 @@ it('discovers the homepage LCP cover from initial HTML with high priority, while
 
 it('serves real smaller cover variants without changing arbitrary CMS or remote images', () => {
   const hero = renderTop().querySelector('.todayCard-cover');
-  expect(hero.getAttribute('srcset')).toBe('/img/covers/coffee-reading-480.webp 480w, /img/covers/coffee-reading-768.webp 768w, /img/covers/coffee-reading-1120.webp 1120w, /img/covers/coffee-reading.webp 1440w');
+  expect(hero.getAttribute('srcset')).toBe('/img/covers/coffee-reading-480.webp?v=perf-20260929 480w, /img/covers/coffee-reading-768.webp?v=perf-20260929 768w, /img/covers/coffee-reading-1120.webp?v=perf-20260929 1120w, /img/covers/coffee-reading.webp?v=perf-20260929 1440w');
   expect(hero.getAttribute('sizes')).toContain('100vw');
-  for (const candidate of hero.getAttribute('srcset').split(', ')) expect(existsSync(`source${candidate.split(' ')[0]}`)).toBe(true);
+  for (const candidate of hero.getAttribute('srcset').split(', ')) expect(existsSync(`source${candidate.split(' ')[0].split('?')[0]}`)).toBe(true);
   for (const image of ['/media/posts/custom.webp', 'https://images.example/cover.webp']) {
     const document = renderTop({ home_top: { ...theme.home_top, banner: { ...theme.home_top.banner, image } } });
     const custom = document.querySelector('.todayCard-cover');
     expect(custom.getAttribute('src')).toBe(image);
     expect(custom.hasAttribute('srcset')).toBe(false);
+  }
+});
+
+it('keeps the first-screen responsive covers within a mobile transfer budget', () => {
+  for (const [name, max768, max1120] of [
+    ['coffee-reading', 30_000, 48_000],
+    ['web-notes', 29_000, 44_000],
+  ]) {
+    expect(statSync(`source/img/covers/${name}-768.webp`).size).toBeLessThan(max768);
+    expect(statSync(`source/img/covers/${name}-1120.webp`).size).toBeLessThan(max1120);
   }
 });
 
@@ -95,7 +105,7 @@ it('starts the first article cover early without downloading the rest of the lis
   const images = new JSDOM(lazyFilter(html)).window.document.querySelectorAll('.post_bg');
   expect(images[0].getAttribute('src')).toBe('/img/covers/web-notes.webp');
   expect(images[0].getAttribute('loading')).toBe('eager');
-  expect(images[0].getAttribute('srcset')).toContain('web-notes-480.webp 480w');
+  expect(images[0].getAttribute('srcset')).toContain('web-notes-480.webp?v=perf-20260929 480w');
   expect(images[1].getAttribute('data-lazy-src')).toBe('/img/covers/web-notes.webp');
   expect(images[1].hasAttribute('srcset')).toBe(false);
 });

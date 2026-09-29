@@ -20,7 +20,7 @@ it('versions the changed local assets used by the released page', () => {
   runInNewContext(readFileSync(file, 'utf8'), { require: createRequire(file), hexo });
   beforeGenerate();
   expect(themeConfig.asset).toMatchObject({
-    main_css: 'css/index.css?v=a11y-20260929',
+    main_css: 'css/index.css?v=perf-20260929',
     main: 'js/main.js?v=perf-20260929',
     utils: 'js/utils.js?v=perf-20260929',
     right_click_menu_js: 'js/anzhiyu/right_click_menu.js?v=perf-20260929',
