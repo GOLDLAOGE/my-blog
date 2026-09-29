@@ -962,21 +962,16 @@ home_top:
   subTitle: 一个东莞小企业主的出海获客实验
   siteText: XIAX.CAFE
   category:
-    - name: 前端
-      path: /categories/前端开发/
+    - name: 独立站
+      path: /categories/独立站/
       shadow: var(--anzhiyu-shadow-blue)
       class: blue
       icon: anzhiyu-icon-dove
-    - name: 大学
-      path: /categories/大学生涯/
+    - name: 小虾实验室
+      path: /categories/小虾实验室/
       shadow: var(--anzhiyu-shadow-red)
       class: red
       icon: anzhiyu-icon-fire
-    - name: 生活
-      path: /categories/生活日常/
-      shadow: var(--anzhiyu-shadow-green)
-      class: green
-      icon: anzhiyu-icon-book
   default_descr: 再怎么看我也不知道怎么描述它的啦！
   swiper:
     enable: false
