@@ -1,8 +1,7 @@
 ---
 title: 第一篇博客
 date: 2026-09-26T17:51:00.000Z
-categories:
-  - 测试
+categories: []
 tags:
   - 测试
 excerpt: 测试
