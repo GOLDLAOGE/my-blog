@@ -1,9 +1,8 @@
 menu:
   首页: "/ || "
-  发现:
-    出海指南: "/categories/ || "
-    实战笔记: "/archives/ || "
-    关于小虾: "/about/ || "
+  出海指南: "/categories/ || "
+  实战笔记: "/archives/ || "
+  关于小虾: "/about/ || "
 
 # nav相关配置
 nav:
