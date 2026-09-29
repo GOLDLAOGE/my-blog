@@ -1193,7 +1193,7 @@ CDN:
   custom_format: # https://npm.elemecdn.com/${name}@latest/${file}
 
   option:
-    main_css: css/index.css?v=perf-20260929
+    main_css: css/index.css?v=perf-20260929-2
     main: js/main.js?v=perf-20260929
     utils: js/utils.js?v=perf-20260929
     right_click_menu_js: js/anzhiyu/right_click_menu.js?v=perf-20260929
