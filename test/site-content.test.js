@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { readFileSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, statSync } from 'node:fs';
 import { parsePost, serializePost } from '../functions/_lib/posts.js';
 import { parsePage, serializePage } from '../functions/_lib/pages.js';
 
@@ -27,6 +27,17 @@ it.each([
   for (const suffix of ['', '-480', '-768', '-1120']) {
     const image = new URL(`../source/img/covers/${coverName}${suffix}.webp`, import.meta.url);
     expect(statSync(image).size).toBeLessThan(150_000);
+  }
+});
+
+it('removes the two old test posts while preserving their public URLs as redirects', () => {
+  const redirects = readFileSync(new URL('../source/_redirects', import.meta.url), 'utf8');
+  for (const [slug, oldUrl] of [
+    ['hello-world', '/2026/09/27/hello-world/'],
+    ['cms-test-post', '/2026/09/26/cms-test-post/'],
+  ]) {
+    expect(existsSync(new URL(`../source/_posts/${slug}.md`, import.meta.url))).toBe(false);
+    expect(redirects).toContain(`${oldUrl} /archives/ 301`);
   }
 });
 
