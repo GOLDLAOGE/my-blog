@@ -34,6 +34,6 @@
   "devDependencies": {
     "esbuild": "0.28.2",
     "vitest": "^5.0.2",
-    "wrangler": "^4.141.0"
+    "wrangler": "^4.142.0"
   }
 }
