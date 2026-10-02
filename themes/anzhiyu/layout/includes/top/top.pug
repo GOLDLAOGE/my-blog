@@ -77,6 +77,7 @@ if home_top_config.enable
           - let top_group_banner_title = theme.home_top.banner.title
           - let top_group_banner_image = theme.home_top.banner.image
           - let top_group_banner_link = url_for(theme.home_top.banner.link)
+          - const bannerSrcset = cover_srcset(top_group_banner_image)
 
           each item, index in top_group_list.slice(0, 6)
             .recent-post-item(onclick=`pjax.loadUrl("${url_for(item.path)}")`)
@@ -92,7 +93,7 @@ if home_top_config.enable
                 if top_group_banner_tips
                   .todayCard-tips=top_group_banner_tips
                 .todayCard-title=top_group_banner_title
-              img.todayCard-cover.nolazyload(src=url_for(top_group_banner_image) srcset=cover_srcset(top_group_banner_image) sizes='(max-width: 1200px) calc(100vw - 32px), 800px' loading='eager' fetchpriority='high' onerror=`this.onerror=null;this.removeAttribute('srcset');this.src='${url_for(theme.error_img.post_page)}'` alt='')
+              img.todayCard-cover.nolazyload(src=url_for(top_group_banner_image) srcset=bannerSrcset width=bannerSrcset ? 1440 : null height=bannerSrcset ? 810 : null sizes='(max-width: 1200px) calc(100vw - 32px), 800px' loading='eager' fetchpriority='high' onerror=`this.onerror=null;this.removeAttribute('srcset');this.src='${url_for(theme.error_img.post_page)}'` alt='')
             .banner-button-group
               button.banner-button(type='button' onclick='anzhiyu.hideTodayCard();')
                 i.anzhiyufont.anzhiyu-icon-arrow-circle-right

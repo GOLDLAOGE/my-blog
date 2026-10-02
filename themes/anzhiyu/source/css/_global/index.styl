@@ -264,10 +264,16 @@ body
   background-color: transparent;
 
 
-// scrollbar - firefox
-*
-  scrollbar-width: thin
-  scrollbar-color: var(--scrollbar-color) transparent
+// Firefox fallback only. In WebKit/Blink, animating inherited scrollbar-color
+// on every transition: all element creates unnecessary main-thread animations.
+@css {
+  @supports not selector(::-webkit-scrollbar) {
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: var(--scrollbar-color) transparent;
+    }
+  }
+}
 
 input::placeholder
   color: var(--font-color)

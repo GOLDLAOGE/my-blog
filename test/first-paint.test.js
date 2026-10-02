@@ -45,6 +45,8 @@ it('discovers the homepage LCP cover from initial HTML with high priority, while
   expect(hero.getAttribute('src')).toBe('/img/covers/coffee-reading.webp');
   expect(hero.hasAttribute('data-lazy-src')).toBe(false);
   expect(hero.getAttribute('loading')).toBe('eager');
+  expect(hero.getAttribute('width')).toBe('1440');
+  expect(hero.getAttribute('height')).toBe('810');
   expect(hero.getAttribute('fetchpriority')).toBe('high');
   expect(document.querySelector('.topGroup .post_bg').getAttribute('data-lazy-src')).toBe('/img/covers/web-notes.webp');
   expect(document.querySelector('.home-brand-icon').hasAttribute('data-lazy-src')).toBe(false);
@@ -60,6 +62,7 @@ it('serves real smaller cover variants without changing arbitrary CMS or remote 
     const custom = document.querySelector('.todayCard-cover');
     expect(custom.getAttribute('src')).toBe(image);
     expect(custom.hasAttribute('srcset')).toBe(false);
+    expect(custom.hasAttribute('width')).toBe(false);
   }
 });
 

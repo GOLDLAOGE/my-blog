@@ -40,7 +40,7 @@ it('builds actual pages, articles, CSS and assets from the editable payload with
     expect(about).toContain('<title>Fixture Search Title | Hexo</title>');expect(about).toContain('name="description" content="Fixture SEO"');expect(about).toContain('Fixture Markdown');expect(about).toContain('name="keywords" content="Fixture keyword"');
     expect(!!new JSDOM(about,{url:'https://fixture.test/about/'}).window.document.querySelector('#aside-content')).toBe(false);
     expect(links).toContain('href="https://friend.example"');expect(links).toContain('/media/fixture-friend.webp');
-    expect(new JSDOM(room).window.document.querySelector('link[href="/css/room.css"]')).not.toBeNull();
+    expect(new JSDOM(room).window.document.querySelector('link[href^="/css/room.css"]')).not.toBeNull();
     const doc=new JSDOM(post,{url:'https://fixture.test/post/'}).window.document;
     expect(doc.querySelector('#post-top-bg')?.getAttribute('alt')).toBe('');
     expect(doc.querySelector('.post-tools-left .weibo a')?.getAttribute('aria-label')).toBe('分享到微博');

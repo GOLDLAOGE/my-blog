@@ -148,18 +148,28 @@ document.addEventListener("DOMContentLoaded", function () {
   let headerContentWidth, $nav, $rightMenu;
 
   const adjustMenu = init => {
+    if (init) {
+      $nav = document.getElementById("nav");
+      headerContentWidth = undefined;
+    }
+    // Mobile always uses the collapsed menu; do not lay out hidden children.
+    if (window.innerWidth <= 768) {
+      $nav.classList.add("hide-menu");
+      return;
+    }
+
     const getAllWidth = ele => {
       return Array.from(ele).reduce((width, i) => width + i.offsetWidth, 0);
     };
 
-    if (init) {
+    if (headerContentWidth === undefined) {
+      $nav.classList.remove("hide-menu");
       const blogInfoWidth = getAllWidth(document.querySelector("#blog_name > a").children);
       const menusWidth = getAllWidth(document.getElementById("menus").children);
       headerContentWidth = blogInfoWidth + menusWidth;
-      $nav = document.getElementById("nav");
     }
 
-    const hideMenuIndex = window.innerWidth <= 768 || headerContentWidth > $nav.offsetWidth - 120;
+    const hideMenuIndex = headerContentWidth > $nav.offsetWidth - 120;
     $nav.classList.toggle("hide-menu", hideMenuIndex);
   };
 
@@ -1178,6 +1188,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const bg = document.getElementById("post-top-bg")
     const path = bg?.src;
     if (!path) {
+      const themeColor = getComputedStyle(root).getPropertyValue("--anzhiyu-theme").trim();
       // 非文章情况，直接设置不需要请求了
       root.style.setProperty("--anzhiyu-bar-background", "var(--anzhiyu-meta-theme-color)");
       requestAnimationFrame(() => {
@@ -1185,18 +1196,9 @@ document.addEventListener("DOMContentLoaded", function () {
       });
 
       // 要改回来默认主色
-      document.documentElement.style.setProperty(
-        "--anzhiyu-main",
-        getComputedStyle(document.documentElement).getPropertyValue("--anzhiyu-theme")
-      );
-      document.documentElement.style.setProperty(
-        "--anzhiyu-theme-op",
-        getComputedStyle(document.documentElement).getPropertyValue("--anzhiyu-main") + "23"
-      );
-      document.documentElement.style.setProperty(
-        "--anzhiyu-theme-op-deep",
-        getComputedStyle(document.documentElement).getPropertyValue("--anzhiyu-main") + "dd"
-      );
+      root.style.setProperty("--anzhiyu-main", themeColor);
+      root.style.setProperty("--anzhiyu-theme-op", themeColor + "23");
+      root.style.setProperty("--anzhiyu-theme-op-deep", themeColor + "dd");
 
       return;
     }

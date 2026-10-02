@@ -20,11 +20,11 @@ it('versions the changed local assets used by the released page', () => {
   runInNewContext(readFileSync(file, 'utf8'), { require: createRequire(file), hexo });
   beforeGenerate();
   expect(themeConfig.asset).toMatchObject({
-    main_css: 'css/index.css?v=perf-20260929',
-    main: 'js/main.js?v=perf-20260929',
-    utils: 'js/utils.js?v=perf-20260929',
-    right_click_menu_js: 'js/anzhiyu/right_click_menu.js?v=perf-20260929',
-    local_search: 'js/search/local-search.js?v=perf-20260929',
-    translate: 'js/tw_cn.js',
+    main_css: 'css/index.css?v=perf-20261002',
+    main: 'js/main.js?v=perf-20261002',
+    utils: 'js/utils.js?v=perf-20261002',
+    right_click_menu_js: 'js/anzhiyu/right_click_menu.js?v=perf-20261002',
+    local_search: 'js/search/local-search.js?v=perf-20261002',
+    translate: 'js/tw_cn.js?v=perf-20261002',
   });
 });
