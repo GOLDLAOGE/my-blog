@@ -21,12 +21,26 @@ script.
     scrollRestoration: false
   })
 
-  // A very early click must not render an inner page with only homepage CSS.
+  // Load inner-page styles before PJAX replaces homepage content.
   const loadStyledPage = pjax.loadUrl.bind(pjax)
+  let fullThemeLink
+  let pendingThemeNavigation
   pjax.loadUrl = function (href, options) {
-    const deferredTheme = document.querySelector('link[data-deferred-theme]')
-    if (deferredTheme && deferredTheme.media !== 'all') {
-      window.location.assign(href)
+    const homeTheme = document.querySelector('link[data-home-style]')
+    if (homeTheme) {
+      pendingThemeNavigation = { href, options }
+      if (fullThemeLink) return
+      fullThemeLink = document.createElement('link')
+      fullThemeLink.rel = 'stylesheet'
+      fullThemeLink.href = homeTheme.dataset.fullTheme
+      fullThemeLink.onload = function () {
+        homeTheme.remove()
+        loadStyledPage(pendingThemeNavigation.href, pendingThemeNavigation.options)
+      }
+      fullThemeLink.onerror = function () {
+        window.location.assign(pendingThemeNavigation.href)
+      }
+      document.head.appendChild(fullThemeLink)
       return
     }
     return loadStyledPage(href, options)

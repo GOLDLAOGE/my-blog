@@ -62,10 +62,7 @@ if (theme.icons && theme.icons.fontawesome_animation_css)
 
 //- main css
 if is_home()
-  link(rel='stylesheet', href=url_for('/css/critical.css?v=critical-20261003'))
-  link(rel='stylesheet', href=url_for(theme.asset.main_css) data-deferred-theme media='print' onload="this.onload=null;this.media='all'")
-  noscript
-    link(rel='stylesheet', href=url_for(theme.asset.main_css))
+  link(rel='stylesheet', href=url_for('/css/home.css?v=home-bundle-20261003') data-home-style data-full-theme=url_for(theme.asset.main_css))
 else
   link(rel='stylesheet', href=url_for(theme.asset.main_css))
 if page.type === 'room'

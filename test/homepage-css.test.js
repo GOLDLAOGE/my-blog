@@ -19,24 +19,22 @@ function renderHead(home, scriptEnabled = false) {
     full_date: () => '', toc: () => '', favicon_tag: () => '',
     partial: () => '', fragment_cache: () => '',
   });
-  return new JSDOM(`<head>${html}</head>`, scriptEnabled ? { runScripts: 'dangerously' } : {}).window.document;
+  return new JSDOM(`<head>${html}</head>`, { url: 'https://example.test/', ...(scriptEnabled ? { runScripts: 'dangerously' } : {}) }).window.document;
 }
 
-it('renders homepage critical CSS before a non-blocking full stylesheet, with a working load handler', () => {
+it('renders one complete homepage stylesheet without downloading duplicate critical or inner-page CSS', () => {
   const document = renderHead(true, true);
-  const critical = document.querySelector('link[href*="/css/critical.css"]');
-  expect(critical).not.toBeNull();
-  expect(critical.rel).toBe('stylesheet');
-  const full = document.querySelector('link[href*="/css/index.css"]');
-  expect(full.media).toBe('print');
-  expect(critical.compareDocumentPosition(full) & 4).toBe(4);
-  full.dispatchEvent(new document.defaultView.Event('load'));
-  expect(full.media).toBe('all');
+  expect(document.querySelector('link[href*="/css/critical.css"]')).toBeNull();
+  expect(document.querySelector('link[href*="/css/index.css"]')).toBeNull();
+  const styles = document.querySelectorAll('link[href*="/css/home.css"]');
+  expect(styles).toHaveLength(1);
+  expect(styles[0].rel).toBe('stylesheet');
+  expect(styles[0].media).toBe('');
 });
 
-it('keeps full CSS available with JavaScript disabled and on direct inner-page loads', () => {
+it('keeps home CSS available without JavaScript and full CSS on direct inner-page loads', () => {
   const home = renderHead(true);
-  const fallback = home.querySelector('noscript link[href*="/css/index.css"]');
+  const fallback = home.querySelector('link[href*="/css/home.css"]');
   expect(fallback).not.toBeNull();
   expect(fallback.rel).toBe('stylesheet');
   expect(fallback.media).toBe('');
@@ -47,9 +45,8 @@ it('keeps full CSS available with JavaScript disabled and on direct inner-page l
   expect(full.media).toBe('');
 });
 
-it('uses a full navigation if an article is opened before the deferred theme loads', () => {
-  const document = renderHead(true);
-  const full = document.querySelector('link[href*="/css/index.css"]');
+function navigationApp() {
+  const document = renderHead(true, true);
   const html = pug.renderFile('themes/anzhiyu/layout/includes/third-party/pjax.pug', {
     theme: { pjax: {}, comments: {}, asset: { pjax: '/pjax.js' } }, url_for: value => value,
   });
@@ -61,11 +58,34 @@ it('uses a full navigation if an article is opened before the deferred theme loa
     Pjax: class { loadUrl(href) { requests.push(href); } },
   };
   runInNewContext(script, context);
+  return { document, context, requests, navigations };
+}
+
+it('loads full theme once before PJAX, keeps the latest click, then reuses it', () => {
+  const { document, context, navigations, requests } = navigationApp();
   context.pjax.loadUrl('/article/');
+  expect(requests).toEqual([]);
+  const full = document.querySelector('link[href="/css/index.css?v=test"]');
+  expect(full).not.toBeNull();
+  expect(full.rel).toBe('stylesheet');
+  context.pjax.loadUrl('/latest/');
+  expect(document.querySelectorAll('link[href="/css/index.css?v=test"]')).toHaveLength(1);
+  expect(document.querySelector('link[href*="/css/home.css"]')).not.toBeNull();
+  full.dispatchEvent(new document.defaultView.Event('load'));
+  expect(requests).toEqual(['/latest/']);
+  expect(document.querySelector('link[href*="/css/critical.css"]')).toBeNull();
+  expect(document.querySelector('link[href*="/css/home.css"]')).toBeNull();
+  context.pjax.loadUrl('/other-article/');
+  expect(requests).toEqual(['/latest/', '/other-article/']);
+  expect(navigations).toEqual([]);
+});
+
+it('falls back to a full navigation if the on-demand stylesheet fails', () => {
+  const { document, context, navigations, requests } = navigationApp();
+  context.pjax.loadUrl('/article/');
+  const full = document.querySelector('link[href="/css/index.css?v=test"]');
+  expect(full).not.toBeNull();
+  full.dispatchEvent(new document.defaultView.Event('error'));
   expect(navigations).toEqual(['/article/']);
   expect(requests).toEqual([]);
-  full.media = 'all';
-  context.pjax.loadUrl('/other-article/');
-  expect(requests).toEqual(['/other-article/']);
-  expect(navigations).toEqual(['/article/']);
 });
