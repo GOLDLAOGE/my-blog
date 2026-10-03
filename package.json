@@ -27,7 +27,7 @@
     "hexo-theme-landscape": "^1.0.0",
     "highlight.js": "11.12.0",
     "marked": "15.0.12",
-    "mermaid": "11.17.2",
+    "mermaid": "12.0.0",
     "vditor": "3.11.3",
     "yaml": "^2.9.1"
   },
