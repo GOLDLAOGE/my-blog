@@ -61,7 +61,13 @@ if (theme.icons && theme.icons.fontawesome_animation_css)
   link(rel="stylesheet", href=url_for(theme.icons.fontawesome_animation_css))
 
 //- main css
-link(rel='stylesheet', href=url_for(theme.asset.main_css))
+if is_home()
+  link(rel='stylesheet', href=url_for('/css/critical.css?v=critical-20261003'))
+  link(rel='stylesheet', href=url_for(theme.asset.main_css) data-deferred-theme media='print' onload="this.onload=null;this.media='all'")
+  noscript
+    link(rel='stylesheet', href=url_for(theme.asset.main_css))
+else
+  link(rel='stylesheet', href=url_for(theme.asset.main_css))
 if page.type === 'room'
   link(rel='stylesheet', href=url_for('/css/room.css?v=perf-20261002'))
 if (theme.icons && theme.icons.fontawesome)

@@ -21,6 +21,17 @@ script.
     scrollRestoration: false
   })
 
+  // A very early click must not render an inner page with only homepage CSS.
+  const loadStyledPage = pjax.loadUrl.bind(pjax)
+  pjax.loadUrl = function (href, options) {
+    const deferredTheme = document.querySelector('link[data-deferred-theme]')
+    if (deferredTheme && deferredTheme.media !== 'all') {
+      window.location.assign(href)
+      return
+    }
+    return loadStyledPage(href, options)
+  }
+
   document.addEventListener('pjax:send', function () {
     // removeEventListener scroll 
     anzhiyu.removeGlobalFnEvent('pjax')
