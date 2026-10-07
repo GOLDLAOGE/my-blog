@@ -5,7 +5,7 @@ const { transformSync } = require('esbuild');
 
 function optimizeAssets(publicDir) {
   for (const asset of [
-    'css/index.css', 'css/home.css', 'css/room.css', 'js/main.js', 'js/utils.js',
+    'css/index.css', 'css/home.css', 'css/about.css', 'css/room.css', 'js/main.js', 'js/utils.js',
     'js/tw_cn.js', 'js/anzhiyu/right_click_menu.js', 'js/search/local-search.js',
   ]) {
     const file = resolve(publicDir, asset);

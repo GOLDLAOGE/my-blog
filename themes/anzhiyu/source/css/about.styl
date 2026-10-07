@@ -1,0 +1,21 @@
+// The plain About page uses shared controls and article typography.
+// Keep the original cascade order; other page modules load before PJAX.
+if hexo-config('css_prefix')
+  @import 'nib'
+@import '_third-party/normalize.min.css'
+@import 'var'
+@import '_global/*'
+@import '_page/common'
+// Homepage module also owns the shared popup control.
+@import '_page/homepage'
+@import '_layout/*'
+@import '_mode/*'
+@import '_third-party/snackbar'
+@import '_extra/**/*.css'
+if hexo-config('algolia_search.enable')
+  @import '_search/index'
+  @import '_search/algolia'
+if hexo-config('local_search') && hexo-config('local_search.enable')
+  @import '_search/index'
+  @import '_search/local-search'
+@import '_brand'

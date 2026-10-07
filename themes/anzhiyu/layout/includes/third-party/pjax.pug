@@ -21,7 +21,7 @@ script.
     scrollRestoration: false
   })
 
-  // Load inner-page styles before PJAX replaces homepage content.
+  // Load the full theme before PJAX leaves a page with a smaller stylesheet.
   const loadStyledPage = pjax.loadUrl.bind(pjax)
   let fullThemeLink
   let pendingThemeNavigation
