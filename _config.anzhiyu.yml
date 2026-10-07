@@ -1253,6 +1253,6 @@ CDN:
     # busuanzi:
     # rightmenu:
     # waterfall:
-    # ali_iconfont_css:
+    ali_iconfont_css: /vendor/anzhiyu-iconfont/1.1.9/ali_iconfont_css.css
     # accesskey_js:
     # colorthief:
